@@ -1,0 +1,15 @@
+{
+  "errcode": 0,
+  "msg_list": [
+    {
+      "event_type": "msg_send_fail",
+      "fail_msgid": "wx_outbound_001",
+      "fail_type": 4,
+      "open_kfid": "wkTEST_MINIMAL",
+      "external_userid": "wmTEST001",
+      "send_time": 1717588800
+    }
+  ],
+  "next_cursor": "CUR_FAIL",
+  "has_more": 0
+}

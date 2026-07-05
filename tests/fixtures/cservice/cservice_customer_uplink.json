@@ -1,0 +1,10 @@
+{
+  "type": "cservice_customer_uplink",
+  "protocol_version": 1,
+  "thread_id": 1,
+  "session_id": "SESSION_PLACEHOLDER",
+  "open_kfid": "wkTEST_MINIMAL",
+  "external_userid": "wmTEST001",
+  "body": "客户：你好，想咨询价格",
+  "trigger_wx_msgid": "msg_inbound_001"
+}

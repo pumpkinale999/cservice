@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <ToUserName><![CDATA[wwTESTcorp]]></ToUserName>
+  <FromUserName><![CDATA[sys]]></FromUserName>
+  <CreateTime>1710000000</CreateTime>
+  <MsgType><![CDATA[event]]></MsgType>
+  <Event><![CDATA[kf_msg_or_event]]></Event>
+  <Token><![CDATA[CALLBACK_TOKEN_abc123]]></Token>
+  <OpenKfId><![CDATA[wkTEST_MINIMAL]]></OpenKfId>
+</xml>

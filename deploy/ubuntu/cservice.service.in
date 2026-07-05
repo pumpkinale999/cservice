@@ -1,0 +1,18 @@
+[Unit]
+Description=cservice REST API (WeCom kf · uvicorn)
+After=network.target skstudio.service
+
+[Service]
+Type=simple
+User=cs
+Group=cs
+WorkingDirectory=__APP_ROOT__
+EnvironmentFile=/etc/cservice/cservice.env
+ExecStart=__APP_ROOT__/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port __PORT__
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

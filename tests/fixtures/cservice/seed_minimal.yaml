@@ -1,0 +1,14 @@
+kf_accounts:
+  - open_kfid: wkTEST_MINIMAL
+    display_name: 测试账号
+    api_managed: true
+
+kf_servicers:
+  - open_kfid: wkTEST_MINIMAL
+    servicer_userid: zhangsan
+    sort_order: 0
+
+scene_routes:
+  - open_kfid: wkTEST_MINIMAL
+    scene: 官网
+    servicer_userid: lisi

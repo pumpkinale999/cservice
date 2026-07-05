@@ -1,0 +1,9 @@
+{
+  "type": "cservice_draft_reply",
+  "protocol_version": 1,
+  "thread_id": 1,
+  "session_id": "SESSION_PLACEHOLDER",
+  "body": "您好，请问想了解哪款产品？我可以为您介绍。",
+  "stream_status": "final",
+  "trigger_wx_msgid": "msg_inbound_001"
+}

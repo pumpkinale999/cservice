@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     cservice_wecom_secret: str = ""
     cservice_kf_callback_token: str = ""
     cservice_kf_callback_aes_key: str = ""
+    cservice_hermes_ws_path: str = "/ws/hermes"
     host: str = "127.0.0.1"
     port: int = 8093
 

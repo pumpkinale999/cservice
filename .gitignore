@@ -10,5 +10,7 @@ build/
 .venv/
 venv/
 .env
-data/
+data/*
+!data/.gitkeep
+!data/cservice_seed.yaml
 *.db

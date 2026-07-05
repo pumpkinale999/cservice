@@ -136,11 +136,15 @@ activate_venv() {
 
 ensure_pip_deps() {
   [[ "${CHECK_ONLY}" == 1 ]] && return 0
-  if python -c "import fastapi, uvicorn" 2>/dev/null && [[ "${INSTALL_DEPS}" != 1 ]]; then
-    return 0
+  # 始终 sync editable install，避免 pyproject 增删依赖后旧 venv 缺包（如 pycryptodome）
+  if [[ "${INSTALL_DEPS}" == 1 ]] \
+    || ! python -c "import fastapi, uvicorn" 2>/dev/null \
+    || ! python -c "from Crypto.Cipher import AES" 2>/dev/null; then
+    python -m pip install --upgrade pip setuptools wheel
+    (cd "$REPO_ROOT" && pip install -e ".[dev]" --prefer-binary)
+  else
+    (cd "$REPO_ROOT" && pip install -q -e ".[dev]" --prefer-binary)
   fi
-  python -m pip install --upgrade pip setuptools wheel
-  (cd "$REPO_ROOT" && pip install -e ".[dev]" --prefer-binary)
 }
 
 run_uvicorn() {

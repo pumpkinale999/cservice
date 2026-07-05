@@ -1,0 +1,14 @@
+# cservice MVP 种子数据（样例 · 部署前替换为真实 open_kfid / userid）
+# 加载：python scripts/load_cservice_seed.py --file data/cservice_seed.yaml
+
+kf_accounts:
+  - open_kfid: wkREPLACE_WITH_REAL_OPEN_KFID
+    display_name: 售前
+    api_managed: true
+
+kf_servicers:
+  - open_kfid: wkREPLACE_WITH_REAL_OPEN_KFID
+    servicer_userid: zhangsan
+    sort_order: 0
+
+scene_routes: []

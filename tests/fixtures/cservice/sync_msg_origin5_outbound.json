@@ -1,0 +1,17 @@
+{
+  "errcode": 0,
+  "errmsg": "ok",
+  "next_cursor": "CURSOR_O5",
+  "has_more": 0,
+  "msg_list": [
+    {
+      "msgid": "msg_origin5_001",
+      "open_kfid": "wkTEST_MINIMAL",
+      "external_userid": "wmTEST003",
+      "send_time": 1710000201,
+      "origin": 5,
+      "msgtype": "text",
+      "text": {"content": "经企微客户端发送"}
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "errcode": 0,
+  "errmsg": "ok",
+  "next_cursor": "CURSOR_DOUBLE",
+  "has_more": 0,
+  "msg_list": [
+    {
+      "msgid": "msg_inbound_101",
+      "open_kfid": "wkTEST_MINIMAL",
+      "external_userid": "wmTEST002",
+      "send_time": 1710000101,
+      "origin": 3,
+      "msgtype": "text",
+      "text": {"content": "第一条"}
+    },
+    {
+      "msgid": "msg_inbound_102",
+      "open_kfid": "wkTEST_MINIMAL",
+      "external_userid": "wmTEST002",
+      "send_time": 1710000102,
+      "origin": 3,
+      "msgtype": "text",
+      "text": {"content": "第二条连发"}
+    }
+  ]
+}

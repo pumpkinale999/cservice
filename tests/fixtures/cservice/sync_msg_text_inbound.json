@@ -1,0 +1,18 @@
+{
+  "errcode": 0,
+  "errmsg": "ok",
+  "next_cursor": "CURSOR_PAGE_1",
+  "has_more": 0,
+  "msg_list": [
+    {
+      "msgid": "msg_inbound_001",
+      "open_kfid": "wkTEST_MINIMAL",
+      "external_userid": "wmTEST001",
+      "send_time": 1710000001,
+      "origin": 3,
+      "msgtype": "text",
+      "text": {"content": "你好，想咨询价格"},
+      "scene": "官网"
+    }
+  ]
+}

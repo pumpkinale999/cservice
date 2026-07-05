@@ -21,5 +21,17 @@ jobs:
       - name: Pytest
         run: pytest -v
 
+      - name: M1 verify gate
+        run: bash scripts/verify_cservice_m1.sh
+
+      - name: M2 verify gate
+        run: bash scripts/verify_cservice_m2.sh
+
+      - name: M3 verify gate
+        run: bash scripts/verify_cservice_m3.sh
+
+      - name: M4 verify gate
+        run: bash scripts/verify_cservice_m4.sh
+
       - name: Dev script syntax
         run: bash -n scripts/dev-cservice.sh

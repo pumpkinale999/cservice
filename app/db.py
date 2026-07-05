@@ -21,6 +21,10 @@ class Base(DeclarativeBase):
     pass
 
 
+# Register ORM tables on Base.metadata for Alembic autogenerate.
+from app.models import entities as _entities  # noqa: E402, F401
+
+
 def get_engine():
     global _engine, _SessionLocal
     if _engine is None:
