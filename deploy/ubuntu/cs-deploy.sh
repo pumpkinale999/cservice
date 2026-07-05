@@ -127,6 +127,19 @@ bootstrap() {
   log "Bootstrap 完成"
 }
 
+generate_kf_aes_key() {
+  python3 - <<'PY'
+import base64, os, re
+for _ in range(10000):
+    key = base64.b64encode(os.urandom(32)).decode()[:-1]
+    if len(key) == 43 and re.fullmatch(r"[A-Za-z0-9]+", key):
+        print(key)
+        break
+else:
+    raise SystemExit("failed to generate alnum EncodingAESKey")
+PY
+}
+
 configure() {
   ensure_sudo
   sudo test -f "$SKSTUDIO_ENV" || die "缺少 $SKSTUDIO_ENV"

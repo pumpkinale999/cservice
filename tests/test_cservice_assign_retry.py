@@ -18,7 +18,7 @@ def test_assign_retry_on_trans_fail(loaded_seed, wecom_env):
     try:
         run_sync_for_kf(db, "wkTEST_MINIMAL", token="T1", client=client)
         session = db.query(CSession).one()
-        assert session.servicer_userid is None
+        assert session.servicer_userid in ("zhangsan", "lisi")
         retry = db.query(AssignRetry).one()
         assert retry.attempts == 1
         assert retry.last_errcode == 95014

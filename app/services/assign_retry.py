@@ -22,6 +22,7 @@ def _next_retry_at(attempts: int) -> str:
 
 
 def record_assign_failure(session: Session, csession: CSession, errcode: int) -> None:
+    session.flush()  # same-batch duplicate msg must see pending AssignRetry row
     row = session.get(AssignRetry, csession.id)
     if row is None:
         row = AssignRetry(

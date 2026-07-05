@@ -76,6 +76,16 @@ def assign_session_if_needed(
         )
     except CserviceWecomError as exc:
         record_assign_failure(db, csession, exc.errcode)
+        # 本地先绑定接待，便于 UI 可见；企微 trans 由 assign_retry 后续重试
+        csession.servicer_userid = servicer
+        csession.status = "open"
+        ensure_agent_thread(db, csession, external_userid)
+        logger.warning(
+            "assign trans deferred open_kfid=%s servicer=%s errcode=%s",
+            csession.open_kfid,
+            servicer,
+            exc.errcode,
+        )
         return
 
     csession.servicer_userid = servicer
