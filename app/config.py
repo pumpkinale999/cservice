@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,9 +21,19 @@ class Settings(BaseSettings):
     cservice_wecom_secret: str = ""
     cservice_kf_callback_token: str = ""
     cservice_kf_callback_aes_key: str = ""
+    cservice_demo_outbound: bool = False
     cservice_hermes_ws_path: str = "/ws/hermes"
     host: str = "127.0.0.1"
     port: int = 8093
+
+    @field_validator("cservice_demo_outbound", mode="before")
+    @classmethod
+    def _coerce_demo_outbound(cls, v: object) -> bool:
+        if isinstance(v, bool):
+            return v
+        if v is None:
+            return False
+        return str(v).strip().lower() in ("1", "true", "yes", "on")
 
     def wecom_configured(self) -> bool:
         return bool(

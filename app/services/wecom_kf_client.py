@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+import uuid
 from typing import Any
 
 import httpx
@@ -131,6 +132,13 @@ class WecomKfClient:
         *,
         msgid: str | None = None,
     ) -> dict[str, Any]:
+        corp_id = self.settings.cservice_wecom_corp_id.strip()
+        secret = self.settings.cservice_wecom_secret.strip()
+        if self.settings.cservice_demo_outbound and (not corp_id or not secret):
+            return {
+                "errcode": 0,
+                "msgid": msgid or f"demo-{uuid.uuid4().hex[:16]}",
+            }
         body: dict[str, Any] = {
             "touser": external_userid,
             "open_kfid": open_kfid,

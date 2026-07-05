@@ -156,6 +156,15 @@ configure() {
   set_env_key "$CS_ENV" CSERVICE_DATA_ROOT "${CS_HOME}/cservice"
   set_env_key "$CS_ENV" HOST "127.0.0.1"
   set_env_key "$CS_ENV" PORT "$CS_PORT"
+  local wecom_corp wecom_secret demo_outbound
+  wecom_corp="$(read_env_value "$CS_ENV" CSERVICE_WECOM_CORP_ID)"
+  wecom_secret="$(read_env_value "$CS_ENV" CSERVICE_WECOM_SECRET)"
+  if [[ -n "$wecom_corp" && -n "$wecom_secret" ]]; then
+    demo_outbound="0"
+  else
+    demo_outbound="1"
+  fi
+  set_env_key "$CS_ENV" CSERVICE_DEMO_OUTBOUND "$demo_outbound"
   sudo chmod 600 "$CS_ENV"
   sudo chown root:root "$CS_ENV"
 
