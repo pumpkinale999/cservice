@@ -240,6 +240,23 @@ load_demo_ui() {
   "
 }
 
+purge_sessions() {
+  local keep_name="${1:-}"
+  [[ -n "$keep_name" ]] || die "用法: cs-deploy purge-sessions <保留的 display_name>"
+  log "purge 会话，保留 display_name=${keep_name}"
+  ensure_sudo
+  sudo bash -lc "
+    set -euo pipefail
+    set -a
+    source \"${CS_ENV}\"
+    set +a
+    cd \"${APP_ROOT}\"
+    runuser -u ${CS_USER} -- env HOME=\"${CS_HOME}\" TMPDIR=/tmp \
+      ./.venv/bin/python scripts/purge_cservice_sessions.py \
+      --keep-display-name $(printf '%q' "$keep_name")
+  "
+}
+
 start_service() {
   ensure_sudo
   check_env_file
@@ -290,12 +307,13 @@ deploy() {
 
 usage() {
   cat <<EOF
-用法: deploy/ubuntu/cs-deploy.sh <bootstrap|configure|deploy|health|demo>
+用法: deploy/ubuntu/cs-deploy.sh <bootstrap|configure|deploy|health|demo|purge-sessions>
 
   bootstrap    创建 cs 用户、数据目录、systemd unit、env 模板
   configure    从 /etc/skstudio/skstudio.env 同步 JWT + token · 开启 CSERVICE_ENABLED
   deploy       pip install + alembic + demo UI + 启动 cservice.service + health
   demo         仅加载 demo UI 数据（幂等）
+  purge-sessions <display_name>  删除除指定客户外的全部会话（运维清理）
   health       仅 curl /api/v1/cservice/health
 
 环境变量: APP_ROOT CS_PORT CS_USER SKSTUDIO_ENV CSERVICE_DEMO_SERVICERS CSERVICE_LOAD_DEMO_UI
@@ -309,9 +327,10 @@ main() {
     configure) configure ;;
     deploy) deploy ;;
     demo) load_demo_ui ;;
+    purge-sessions) purge_sessions "${2:-}" ;;
     health) verify_health ;;
     -h|--help|help) usage ;;
-    *) die "用法: $0 bootstrap|configure|deploy|health|demo" ;;
+    *) die "用法: $0 bootstrap|configure|deploy|health|demo|purge-sessions" ;;
   esac
 }
 
