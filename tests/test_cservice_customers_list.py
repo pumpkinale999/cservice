@@ -70,14 +70,14 @@ def _seed_session(
     return sid
 
 
-def test_customers_list_servicer_filter(loaded_seed, monkeypatch):
+def test_customers_list_pool_shows_all_open(loaded_seed, monkeypatch):
     monkeypatch.setenv("CSERVICE_SERVICE_TOKEN", TOKEN)
     get_settings.cache_clear()
     factory = get_session_factory()
     db = factory()
     try:
         zhang_sid = _seed_session(db, servicer=ZHANGSAN)
-        _seed_session(db, servicer=LISI)
+        lisi_sid = _seed_session(db, servicer=LISI)
         db.commit()
     finally:
         db.close()
@@ -86,9 +86,10 @@ def test_customers_list_servicer_filter(loaded_seed, monkeypatch):
     r = client.get("/api/v1/cservice/customers", headers=_auth_headers(ZHANGSAN))
     assert r.status_code == 200
     body = r.json()
-    assert len(body["customers"]) == 1
-    row = body["customers"][0]
-    assert row["session_id"] == zhang_sid
+    assert len(body["customers"]) == 2
+    ids = {row["session_id"] for row in body["customers"]}
+    assert ids == {zhang_sid, lisi_sid}
+    row = next(x for x in body["customers"] if x["session_id"] == zhang_sid)
     assert row["pending_reply_count"] == 1
     assert row["kf_account_short_name"] == "测试账号"
     assert row["scene"] == "官网"
@@ -112,7 +113,7 @@ def test_customers_list_excludes_closed(loaded_seed, monkeypatch):
     assert r.json()["customers"] == []
 
 
-def test_thread_forbidden_other_servicer(loaded_seed, monkeypatch):
+def test_thread_pool_allows_any_servicer(loaded_seed, monkeypatch):
     monkeypatch.setenv("CSERVICE_SERVICE_TOKEN", TOKEN)
     get_settings.cache_clear()
     factory = get_session_factory()
@@ -128,4 +129,5 @@ def test_thread_forbidden_other_servicer(loaded_seed, monkeypatch):
         f"/api/v1/cservice/customers/{sid}/thread",
         headers=_auth_headers(ZHANGSAN),
     )
-    assert r.status_code == 403
+    assert r.status_code == 200
+    assert r.json()["session_id"] == sid

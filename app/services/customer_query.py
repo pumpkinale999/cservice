@@ -21,16 +21,13 @@ def _last_message_preview(db: Session, session_id: str) -> str | None:
     return text[:120] if len(text) > 120 else text
 
 
-def list_customers_for_servicer(db: Session, servicer_userid: str) -> list[dict]:
-    """Open sessions assigned to servicer, newest activity first."""
+def list_open_customer_sessions(db: Session) -> list[dict]:
+    """All non-closed sessions (public pool), newest activity first."""
     rows = (
         db.query(CSession, Customer, KfAccount)
         .join(Customer, CSession.customer_id == Customer.id)
         .join(KfAccount, CSession.open_kfid == KfAccount.open_kfid)
-        .filter(
-            CSession.servicer_userid == servicer_userid,
-            CSession.status == "open",
-        )
+        .filter(CSession.status.in_(("open", "unassigned")))
         .order_by(desc(CSession.last_activity_at))
         .all()
     )

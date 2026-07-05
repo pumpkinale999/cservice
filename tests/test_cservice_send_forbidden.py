@@ -23,7 +23,7 @@ def _headers(actor: str = ZHANGSAN) -> dict[str, str]:
     }
 
 
-def test_send_forbidden_wrong_servicer(loaded_seed, monkeypatch):
+def test_send_pool_allows_any_servicer(loaded_seed, monkeypatch):
     monkeypatch.setenv("CSERVICE_SERVICE_TOKEN", TOKEN)
     get_settings.cache_clear()
     factory = get_session_factory()
@@ -35,14 +35,15 @@ def test_send_forbidden_wrong_servicer(loaded_seed, monkeypatch):
         db.close()
 
     mock_client = MagicMock()
+    mock_client.send_text_msg.return_value = {"errcode": 0, "msgid": "wx_out_1"}
     with patch("app.routes_cservice._wecom_client", return_value=mock_client):
         client = TestClient(app)
         r = client.post(
             f"/api/v1/cservice/drafts/{draft_id}/send",
             headers=_headers(LISI),
         )
-    assert r.status_code == 403
-    mock_client.send_text_msg.assert_not_called()
+    assert r.status_code == 200
+    mock_client.send_text_msg.assert_called_once()
 
 
 def test_send_draft_superseded(loaded_seed, monkeypatch):

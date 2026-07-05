@@ -15,7 +15,7 @@ from app.config import get_settings
 from app.db import db_ok, get_session_factory, table_exists
 from app.hermes.connection_registry import is_cservice_gateway_registered
 from app.models import KfAccount, Session as CSession, SyncState
-from app.services.customer_query import list_customers_for_servicer
+from app.services.customer_query import list_open_customer_sessions
 from app.services.outbound_service import (
     send_draft_as_agent,
     send_draft_edited,
@@ -90,11 +90,12 @@ def cservice_health() -> dict:
 def list_customers(
     actor_user_id: Annotated[str, Depends(require_service_auth)],
 ) -> dict:
-    """Assigned customer sessions for servicer (§14)."""
+    """All open customer sessions — public pool (§14)."""
+    _ = actor_user_id  # auth only; list is not filtered by servicer
     factory = get_session_factory()
     db = factory()
     try:
-        items = list_customers_for_servicer(db, actor_user_id)
+        items = list_open_customer_sessions(db)
         return {"customers": items}
     finally:
         db.close()

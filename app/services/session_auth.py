@@ -8,13 +8,12 @@ from app.models import Session as CSession
 
 
 def require_session_servicer(session: CSession, actor_userid: str) -> None:
-    """Raise 403 if actor is not the assigned servicer."""
-    servicer = (session.servicer_userid or "").strip()
-    actor = actor_userid.strip()
-    if not servicer or servicer != actor:
+    """Public pool: any authenticated servicer may access sessions."""
+    _ = session
+    if not actor_userid.strip():
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="not_session_servicer",
+            detail="missing_actor",
         )
 
 
