@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.models import SyncState
 from app.services.assign import assign_session_if_needed
+from app.services.ingress_filter import record_skipped_ingress, should_skip_customer_ingress
 from app.services.message_ingest import ingest_sync_message, message_item_scene
 from app.services.send_fail_handler import apply_msg_send_fail
 from app.services.uplink_hook import HermesUplinkHook, NoopUplinkHook, UplinkHook
@@ -84,6 +85,9 @@ def run_sync_for_kf(
         for item in msg_list:
             if str(item.get("event_type") or "") == "msg_send_fail":
                 apply_msg_send_fail(db, item)
+                continue
+            if should_skip_customer_ingress(item):
+                record_skipped_ingress(db, item, open_kfid)
                 continue
             csession, customer, is_new = ingest_sync_message(db, item, open_kfid)
             if not is_new:

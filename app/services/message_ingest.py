@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.models import AuditLog, Customer, Draft, Message, Session as CSession
 from app.services.badge import on_round_cover_outbound, on_text_inbound
+from app.services.ingress_filter import valid_external_userid
 
 PLACEHOLDER_NON_TEXT = "[暂不支持该类型，请人工在其它渠道处理]"
 ORIGIN5_NOTE = "（经企微客户端发送）"
@@ -99,6 +100,8 @@ def ingest_sync_message(
         return csession, customer, False
 
     external_userid = str(item.get("external_userid", ""))
+    if not valid_external_userid(external_userid):
+        raise ValueError("invalid external_userid")
     scene = item.get("scene") or item.get("scene_param")
     scene_str = str(scene) if scene else None
     customer = _get_or_create_customer(db, external_userid, scene_str)

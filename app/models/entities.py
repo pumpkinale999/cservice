@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -104,14 +104,19 @@ class AgentThread(Base):
         String(36),
         ForeignKey("cservice_session.id"),
         nullable=False,
-        unique=True,
     )
     open_kfid: Mapped[str] = mapped_column(String(64), nullable=False)
     external_userid: Mapped[str] = mapped_column(String(64), nullable=False)
     hermes_profile: Mapped[str] = mapped_column(Text, nullable=False, default="cservice-assistant")
+    uplink_pending: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    uplink_started_at: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
     session: Mapped[Session] = relationship("Session", back_populates="agent_thread")
+
+    __table_args__ = (
+        UniqueConstraint("open_kfid", "external_userid", name="uq_agent_thread_kf_customer"),
+    )
 
 
 class Message(Base):
@@ -147,6 +152,7 @@ class Draft(Base):
     )
     agent_text: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(Text, nullable=False, default="pending")
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     superseded_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -212,3 +218,14 @@ class UplinkRetry(Base):
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     next_retry_at: Mapped[str | None] = mapped_column(Text, nullable=True)
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class EventLog(Base):
+    __tablename__ = "cservice_event_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    open_kfid: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    event_type: Mapped[str] = mapped_column(Text, nullable=False)
+    external_userid: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)

@@ -6,6 +6,7 @@ import logging
 import uuid
 from datetime import UTC, datetime
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models import Draft, Message
@@ -15,6 +16,15 @@ logger = logging.getLogger(__name__)
 
 def _now() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
+
+
+def _next_draft_version(db: Session, session_id: str) -> int:
+    current = (
+        db.query(func.max(Draft.version))
+        .filter_by(session_id=session_id)
+        .scalar()
+    )
+    return int(current or 0) + 1
 
 
 def supersede_pending_drafts(db: Session, session_id: str, reason: str) -> None:
@@ -47,6 +57,7 @@ def upsert_draft_pending(db: Session, session_id: str, agent_text: str) -> Draft
         session_id=session_id,
         agent_text=agent_text,
         status="pending",
+        version=_next_draft_version(db, session_id),
         superseded_reason=None,
         created_at=_now(),
     )
@@ -63,6 +74,7 @@ def upsert_draft_failed(db: Session, session_id: str, agent_text: str = "") -> D
         session_id=session_id,
         agent_text=text,
         status="failed",
+        version=_next_draft_version(db, session_id),
         superseded_reason=None,
         created_at=_now(),
     )

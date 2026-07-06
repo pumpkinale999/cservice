@@ -89,6 +89,7 @@ def _seed_thread(db) -> str:
             session_id=sid,
             agent_text="Agent 建议",
             status="pending",
+            version=1,
             created_at="2026-07-05T12:03:00+00:00",
         )
     )
@@ -118,3 +119,42 @@ def test_thread_messages_and_draft(loaded_seed, monkeypatch):
     assert failed["delivery_status"] == "failed"
     assert "48 小时" in failed["delivery_error"]
     assert body["pending_draft"]["agent_text"] == "Agent 建议"
+    assert body["pending_draft"]["version"] == 1
+    assert "uplink_pending" in body
+    assert body["uplink_pending"] is False
+
+
+def test_uplink_pending_after_enqueue(loaded_seed, wecom_env, monkeypatch):
+    monkeypatch.setenv("CSERVICE_SERVICE_TOKEN", TOKEN)
+    get_settings.cache_clear()
+    from app.hermes.uplink_queue import enqueue_uplink
+    from app.models import AgentThread
+    from app.services.agent_thread import ensure_agent_thread
+
+    factory = get_session_factory()
+    db = factory()
+    try:
+        sid = _seed_thread(db)
+        csession = db.get(CSession, sid)
+        thread = ensure_agent_thread(db, csession, "wm1")
+        db.commit()
+        enqueue_uplink(
+            db,
+            session_id=sid,
+            thread_id=thread.id,
+            open_kfid="wkTEST_MINIMAL",
+            external_userid="wm1",
+            text="新问题",
+            trigger_wx_msgid="wx_new",
+            supersede=False,
+        )
+        db.commit()
+        thread = db.get(AgentThread, thread.id)
+        assert thread.uplink_pending is True
+    finally:
+        db.close()
+
+    client = TestClient(app)
+    r = client.get(f"/api/v1/cservice/customers/{sid}/thread", headers=_auth_headers())
+    assert r.status_code == 200
+    assert r.json()["uplink_pending"] is True

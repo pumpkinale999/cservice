@@ -1,7 +1,8 @@
-"""Outbound send_msg orchestration (§17.3 · M4)."""
+"""Outbound send_msg orchestration (§17.3 · M4 · CS-24)."""
 
 from __future__ import annotations
 
+import logging
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -14,6 +15,8 @@ from app.services.badge import on_round_cover_outbound
 from app.services.session_auth import require_session_open, require_session_servicer
 from app.services.wecom_errors import CserviceWecomError
 from app.services.wecom_kf_client import WecomKfClient
+
+logger = logging.getLogger(__name__)
 
 
 def _now() -> str:
@@ -30,13 +33,50 @@ def _validate_text(text: str) -> str:
     return content
 
 
-def _get_draft_pending(db: Session, draft_id: str) -> Draft:
+def _get_draft(db: Session, draft_id: str) -> Draft:
     draft = db.get(Draft, draft_id)
     if draft is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="draft_not_found")
-    if draft.status != "pending":
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="draft_not_pending")
     return draft
+
+
+def _resolve_expected_version(draft: Draft, expected_version: int) -> int:
+    return expected_version
+
+
+def _raise_draft_conflict(draft: Draft) -> None:
+    if draft.status == "superseded":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"code": "draft_superseded", "message": "草稿已被新消息覆盖"},
+        )
+    if draft.status == "sent":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"code": "draft_concurrent_conflict", "message": "该草稿已被其他接待发送"},
+        )
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail={"code": "draft_not_pending", "message": "草稿不可发送"},
+    )
+
+
+def _claim_draft_for_send(db: Session, draft: Draft, expected_version: int) -> None:
+    if draft.status != "pending":
+        _raise_draft_conflict(draft)
+    if draft.version != expected_version:
+        _raise_draft_conflict(draft)
+    updated = (
+        db.query(Draft)
+        .filter_by(id=draft.id, version=expected_version, status="pending")
+        .update({"status": "sent"}, synchronize_session=False)
+    )
+    if updated == 0:
+        db.expire(draft)
+        fresh = db.get(Draft, draft.id)
+        assert fresh is not None
+        _raise_draft_conflict(fresh)
+    db.expire(draft)
 
 
 def _get_session_for_send(db: Session, session_id: str, actor: str) -> tuple[CSession, Customer]:
@@ -91,10 +131,13 @@ def send_draft_as_agent(
     draft_id: str,
     actor: str,
     client: WecomKfClient,
+    expected_version: int | None = None,
 ) -> dict[str, Any]:
-    draft = _get_draft_pending(db, draft_id)
+    draft = _get_draft(db, draft_id)
+    version = _resolve_expected_version(draft, expected_version)
     csession, customer = _get_session_for_send(db, draft.session_id, actor)
     content = _validate_text(draft.agent_text)
+    _claim_draft_for_send(db, draft, version)
     result = _call_send_msg(client, csession.open_kfid, customer.external_userid, content)
     wx_msgid = str(result.get("msgid") or f"local-{uuid.uuid4()}")
     msg = Message(
@@ -110,7 +153,6 @@ def send_draft_as_agent(
         created_at=_now(),
     )
     db.add(msg)
-    draft.status = "sent"
     _write_audit(db, actor=actor, action="send_agent", draft_id=draft.id)
     on_round_cover_outbound(csession)
     db.flush()
@@ -124,10 +166,14 @@ def send_draft_edited(
     actor: str,
     text: str,
     client: WecomKfClient,
+    expected_version: int | None = None,
 ) -> dict[str, Any]:
-    draft = _get_draft_pending(db, draft_id)
+    draft = _get_draft(db, draft_id)
+    version = _resolve_expected_version(draft, expected_version)
     csession, customer = _get_session_for_send(db, draft.session_id, actor)
     edited = _validate_text(text)
+    agent_text = draft.agent_text
+    _claim_draft_for_send(db, draft, version)
     result = _call_send_msg(client, csession.open_kfid, customer.external_userid, edited)
     wx_msgid = str(result.get("msgid") or f"local-{uuid.uuid4()}")
     db.add(
@@ -137,7 +183,7 @@ def send_draft_edited(
             direction="outbound",
             wx_msgid=None,
             msg_type="text",
-            content=draft.agent_text,
+            content=agent_text,
             sender_type="agent",
             draft_id=draft.id,
             delivery_status="draft_only",
@@ -157,7 +203,6 @@ def send_draft_edited(
         created_at=_now(),
     )
     db.add(msg)
-    draft.status = "sent"
     _write_audit(
         db,
         actor=actor,

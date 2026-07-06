@@ -44,6 +44,17 @@ WeCom **微信客服** backend — independent repo/process (同构 [`knowledge_
 - 门禁：[`skstudio/scripts/verify_cservice_m5.sh`](https://github.com/pumpkinale999/skstudio/blob/main/scripts/verify_cservice_m5.sh) · E2E `e2e/cservice/happy-path.spec.ts`（CS-17）
 - 产品规格：[skstudio/docs/cservice-产品设计.md](https://github.com/pumpkinale999/skstudio/blob/main/docs/cservice-产品设计.md) **v0.9.7** · §0.2 MVP closure **已达成**
 
+**M6 · 客服助手闭环 ✅（后端 + skstudio UI）**
+
+- Alembic **`003_cservice_m6`** · 富 uplink · thread 复用 · `uplink_pending` · draft CAS
+- skstudio：`AssistantReplyPanel` / `ManualReplyPanel` · BFF `expected_version`
+- 门禁：
+  - `./scripts/verify_cservice_m6.sh`（本仓 · CS-19–24）
+  - [`skstudio/scripts/verify_cservice_m6_ui.sh`](https://github.com/pumpkinale999/skstudio/blob/main/scripts/verify_cservice_m6_ui.sh)（CS-22–24）
+  - [`skstudio/scripts/verify_cservice_m6.sh`](https://github.com/pumpkinale999/skstudio/blob/main/scripts/verify_cservice_m6.sh)（编排）
+  - `deploy/ubuntu/cs-deploy.sh verify-m6` · CS-25 步骤 1（health + GW）
+- **CS-25** 真微信 smoke：§30.4 步骤 2–6（运维手工）
+
 ## Architecture
 
 ```text
@@ -114,6 +125,9 @@ curl -H "Authorization: Bearer $JWT" http://127.0.0.1:8000/api/v1/cservice/custo
 ./scripts/verify_cservice_m2.sh   # M2 · CS-01/03/14/15
 ./scripts/verify_cservice_m3.sh   # M3 · CS-04/08/12
 ./scripts/verify_cservice_m4.sh   # M4 · CS-02/06/07/13/16
+./scripts/verify_cservice_m6.sh   # M6 · CS-19–24
+# skstudio 侧：verify_cservice_m6_ui.sh · verify_cservice_m6.sh（编排）
+# 生产 CS-25 步骤 1：deploy/ubuntu/cs-deploy.sh verify-m6
 pytest -q
 ```
 

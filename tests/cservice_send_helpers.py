@@ -50,6 +50,7 @@ def seed_session_with_draft(db, *, agent_text: str = "您好，请问需要什�
             session_id=sid,
             agent_text=agent_text,
             status="pending",
+            version=1,
             created_at="2026-07-05T12:01:00+00:00",
         )
     )

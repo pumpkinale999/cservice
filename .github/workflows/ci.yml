@@ -33,5 +33,8 @@ jobs:
       - name: M4 verify gate
         run: bash scripts/verify_cservice_m4.sh
 
+      - name: M6 verify gate
+        run: bash scripts/verify_cservice_m6.sh
+
       - name: Dev script syntax
         run: bash -n scripts/dev-cservice.sh

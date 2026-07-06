@@ -7,6 +7,7 @@ import logging
 from sqlalchemy.orm import Session
 
 from app.hermes.schemas import CserviceDraftReply
+from app.services.agent_thread import clear_uplink_pending
 from app.services.draft_service import (
     should_accept_downlink,
     upsert_draft_failed,
@@ -24,5 +25,6 @@ def apply_draft_downlink(db: Session, frame: CserviceDraftReply) -> bool:
         upsert_draft_failed(db, frame.session_id, frame.body)
     else:
         upsert_draft_pending(db, frame.session_id, frame.body)
+    clear_uplink_pending(db, session_id=frame.session_id)
     db.commit()
     return True

@@ -30,6 +30,11 @@ router = APIRouter(prefix="/cservice", tags=["cservice"])
 
 class SendEditedBody(BaseModel):
     text: str
+    expected_version: int
+
+
+class SendDraftBody(BaseModel):
+    expected_version: int
 
 
 class SendManualBody(BaseModel):
@@ -125,13 +130,20 @@ def get_customer_thread(
 @router.post("/drafts/{draft_id}/send")
 def post_draft_send(
     draft_id: str,
+    body: SendDraftBody,
     actor_user_id: Annotated[str, Depends(require_service_auth)],
 ) -> dict:
     factory = get_session_factory()
     db = factory()
     client = _wecom_client()
     try:
-        result = send_draft_as_agent(db, draft_id=draft_id, actor=actor_user_id, client=client)
+        result = send_draft_as_agent(
+            db,
+            draft_id=draft_id,
+            actor=actor_user_id,
+            client=client,
+            expected_version=body.expected_version,
+        )
         db.commit()
         return result
     finally:
@@ -155,6 +167,7 @@ def post_draft_send_edited(
             actor=actor_user_id,
             text=body.text,
             client=client,
+            expected_version=body.expected_version,
         )
         db.commit()
         return result

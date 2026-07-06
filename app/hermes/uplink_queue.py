@@ -1,4 +1,4 @@
-"""Hermes uplink queue (§15.3 · §15.5)."""
+"""Hermes uplink queue (§15.3 · §15.5 · CS-19 · CS-23)."""
 
 from __future__ import annotations
 
@@ -8,13 +8,17 @@ from sqlalchemy.orm import Session
 
 from app.hermes import connection_registry
 from app.hermes.schemas import CserviceCustomerUplink
+from app.models import Session as CSession
+from app.services.agent_thread import mark_uplink_pending
 from app.services.draft_service import supersede_pending_drafts
+from app.services.uplink_context import build_uplink_body
 from app.services.uplink_retry import clear_uplink_retry, due_retries, record_uplink_failure
 
 logger = logging.getLogger(__name__)
 
 
 def _build_uplink(
+    db: Session,
     *,
     thread_id: int,
     session_id: str,
@@ -23,7 +27,18 @@ def _build_uplink(
     text: str,
     trigger_wx_msgid: str,
 ) -> CserviceCustomerUplink:
-    body = f"客户：{text}"
+    csession = db.get(CSession, session_id)
+    if csession is None:
+        body = f"客户：{text}"
+    else:
+        scene = csession.customer.last_scene if csession.customer else None
+        body = build_uplink_body(
+            db,
+            csession=csession,
+            external_userid=external_userid,
+            pending_reply_text=text,
+            scene=scene,
+        )
     return CserviceCustomerUplink(
         thread_id=thread_id,
         session_id=session_id,
@@ -48,7 +63,13 @@ def enqueue_uplink(
     """Enqueue uplink; persist to retry table if GW offline."""
     if supersede:
         supersede_pending_drafts(db, session_id, "new_inbound")
+    from app.models import AgentThread
+
+    thread = db.get(AgentThread, thread_id)
+    if thread is not None:
+        mark_uplink_pending(db, thread)
     frame = _build_uplink(
+        db,
         thread_id=thread_id,
         session_id=session_id,
         open_kfid=open_kfid,

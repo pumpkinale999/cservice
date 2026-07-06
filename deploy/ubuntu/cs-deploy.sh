@@ -278,6 +278,11 @@ verify_health() {
     if out="$(curl -sf "$url" 2>/dev/null)"; then
       echo "$out" | grep -q '"ok"' || die "health 响应异常: $out"
       log "✓ health OK"
+      if [[ "${CSERVICE_VERIFY_GW:-0}" == "1" ]]; then
+        echo "$out" | grep -q '"hermes_cservice_gateway"[[:space:]]*:[[:space:]]*true' \
+          || die "hermes_cservice_gateway!=true — 请启动 hermes-gateway-cservice-assistant"
+        log "✓ hermes_cservice_gateway=true"
+      fi
       return 0
     fi
     sleep 1
@@ -314,7 +319,8 @@ usage() {
   deploy       pip install + alembic + demo UI + 启动 cservice.service + health
   demo         仅加载 demo UI 数据（幂等）
   purge-sessions <display_name>  删除除指定客户外的全部会话（运维清理）
-  health       仅 curl /api/v1/cservice/health
+  health       仅 curl /api/v1/cservice/health（CSERVICE_VERIFY_GW=1 时断言 GW）
+  verify-m6    CS-25 步骤 1：health + hermes_cservice_gateway（同 CSERVICE_VERIFY_GW=1）
 
 环境变量: APP_ROOT CS_PORT CS_USER SKSTUDIO_ENV CSERVICE_DEMO_SERVICERS CSERVICE_LOAD_DEMO_UI
 EOF
@@ -329,6 +335,7 @@ main() {
     demo) load_demo_ui ;;
     purge-sessions) purge_sessions "${2:-}" ;;
     health) verify_health ;;
+    verify-m6) CSERVICE_VERIFY_GW=1 verify_health ;;
     -h|--help|help) usage ;;
     *) die "用法: $0 bootstrap|configure|deploy|health|demo|purge-sessions" ;;
   esac
