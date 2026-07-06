@@ -21,6 +21,18 @@ def _parse_bool(value: Any) -> int:
     return 0
 
 
+def _parse_enabled(value: Any) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return value != 0
+    if isinstance(value, str):
+        return value.lower() in ("1", "true", "yes")
+    return True
+
+
 def load_seed_data(data: dict[str, Any], session: Session) -> dict[str, int]:
     """Upsert kf_accounts, kf_servicers, scene_routes. Returns row counts."""
     counts = {"kf_accounts": 0, "kf_servicers": 0, "scene_routes": 0}
@@ -49,21 +61,26 @@ def load_seed_data(data: dict[str, Any], session: Session) -> dict[str, int]:
     for item in data.get("kf_servicers") or []:
         open_kfid = str(item["open_kfid"])
         servicer_userid = str(item["servicer_userid"])
+        user_id = str(item.get("user_id") or servicer_userid)
         row = (
             session.query(KfServicer)
-            .filter_by(open_kfid=open_kfid, servicer_userid=servicer_userid)
+            .filter_by(open_kfid=open_kfid, user_id=user_id)
             .one_or_none()
         )
         if row is None:
             session.add(
                 KfServicer(
                     open_kfid=open_kfid,
+                    user_id=user_id,
                     servicer_userid=servicer_userid,
                     sort_order=int(item.get("sort_order") or 0),
+                    enabled=_parse_enabled(item.get("enabled")),
                 )
             )
         else:
+            row.servicer_userid = servicer_userid
             row.sort_order = int(item.get("sort_order", row.sort_order))
+            row.enabled = _parse_enabled(item.get("enabled", row.enabled))
         counts["kf_servicers"] += 1
 
     for item in data.get("scene_routes") or []:

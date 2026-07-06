@@ -24,9 +24,10 @@ def test_load_seed_minimal(tmp_cservice_db):
 
         servicer = (
             session.query(KfServicer)
-            .filter_by(open_kfid="wkTEST_MINIMAL", servicer_userid="zhangsan")
+            .filter_by(open_kfid="wkTEST_MINIMAL", user_id="101")
             .one()
         )
+        assert servicer.servicer_userid == "zhangsan"
         assert servicer.sort_order == 0
 
         route = (

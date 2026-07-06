@@ -23,6 +23,19 @@ def test_migration_all_tables(tmp_cservice_db):
         assert table_exists(name), name
 
 
+def test_migration_m7_columns(tmp_cservice_db):
+    from sqlalchemy import inspect
+
+    from app.db import get_engine
+
+    insp = inspect(get_engine())
+    servicer_cols = {c["name"] for c in insp.get_columns("cservice_kf_servicer")}
+    assert "user_id" in servicer_cols
+    assert "enabled" in servicer_cols
+    pk = insp.get_pk_constraint("cservice_kf_servicer")
+    assert set(pk["constrained_columns"]) == {"open_kfid", "user_id"}
+
+
 def test_migration_m6_columns(tmp_cservice_db):
     from sqlalchemy import inspect
 

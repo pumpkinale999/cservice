@@ -29,8 +29,10 @@ class KfServicer(Base):
         ForeignKey("cservice_kf_account.open_kfid"),
         primary_key=True,
     )
-    servicer_userid: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    servicer_userid: Mapped[str] = mapped_column(String(64), nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     account: Mapped[KfAccount] = relationship("KfAccount", back_populates="servicers")
 

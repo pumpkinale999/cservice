@@ -14,6 +14,7 @@ def test_round_robin(loaded_seed):
         db.add(
             KfServicer(
                 open_kfid="wkTEST_MINIMAL",
+                user_id="102",
                 servicer_userid="lisi",
                 sort_order=1,
             )

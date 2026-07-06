@@ -32,6 +32,7 @@ def test_kf_account_and_servicer_crud(tmp_cservice_db):
         db.add(
             KfServicer(
                 open_kfid="wkTEST001",
+                user_id="101",
                 servicer_userid="zhangsan",
                 sort_order=0,
             )
@@ -39,6 +40,7 @@ def test_kf_account_and_servicer_crud(tmp_cservice_db):
         db.commit()
 
         row = db.query(KfServicer).filter_by(open_kfid="wkTEST001").one()
+        assert row.user_id == "101"
         assert row.servicer_userid == "zhangsan"
         assert row.account.display_name == "售前"
     finally:

@@ -31,7 +31,7 @@ def pick_servicer(
 
     servicers = (
         session.query(KfServicer)
-        .filter_by(open_kfid=open_kfid)
+        .filter_by(open_kfid=open_kfid, enabled=True)
         .order_by(KfServicer.sort_order.asc())
         .all()
     )

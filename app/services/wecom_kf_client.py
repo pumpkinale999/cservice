@@ -165,6 +165,28 @@ class WecomKfClient:
             body["msgid"] = msgid
         return self._post_json("/cgi-bin/kf/send_msg", body)
 
+    def servicer_list(self, open_kfid: str) -> dict[str, Any]:
+        return self._post_json(
+            "/cgi-bin/kf/servicer/list",
+            {"open_kfid": open_kfid},
+        )
+
+    def servicer_add(self, open_kfid: str, userid_list: list[str]) -> dict[str, Any]:
+        if not userid_list:
+            return {"errcode": 0, "errmsg": "ok", "result_list": []}
+        return self._post_json(
+            "/cgi-bin/kf/servicer/add",
+            {"open_kfid": open_kfid, "userid_list": userid_list},
+        )
+
+    def servicer_del(self, open_kfid: str, userid_list: list[str]) -> dict[str, Any]:
+        if not userid_list:
+            return {"errcode": 0, "errmsg": "ok", "result_list": []}
+        return self._post_json(
+            "/cgi-bin/kf/servicer/del",
+            {"open_kfid": open_kfid, "userid_list": userid_list},
+        )
+
 
 def reset_token_cache() -> None:
     global _TOKEN_CACHE

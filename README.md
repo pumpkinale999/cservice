@@ -55,6 +55,13 @@ WeCom **微信客服** backend — independent repo/process (同构 [`knowledge_
   - `deploy/ubuntu/cs-deploy.sh verify-m6` · CS-25 步骤 1（health + GW）
 - **CS-25** 真微信 smoke：§30.4 步骤 2–6（运维手工）
 
+**M7 · 接待配置 + Tab 门禁 ✅**
+
+- Alembic **`004_cservice_m7_servicer_user_id`** · internal servicer 治理 API · 企微 sync
+- 门禁：`./scripts/verify_cservice_m7.sh`（本仓）
+- skstudio：`routes_cservice_admin_bff` · Tab 门禁 · `ServicerSettingsDrawer` · [`verify_cservice_m7.sh`](https://github.com/pumpkinale999/skstudio/blob/main/scripts/verify_cservice_m7.sh)
+- 生产部署前：**§30.4.1** migration 004 `user_id` 回填 SOP（skstudio 产品 doc）
+
 ## Architecture
 
 ```text

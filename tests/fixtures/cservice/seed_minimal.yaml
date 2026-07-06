@@ -5,8 +5,10 @@ kf_accounts:
 
 kf_servicers:
   - open_kfid: wkTEST_MINIMAL
+    user_id: "101"
     servicer_userid: zhangsan
     sort_order: 0
+    enabled: true
 
 scene_routes:
   - open_kfid: wkTEST_MINIMAL
