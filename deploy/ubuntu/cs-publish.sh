@@ -22,7 +22,7 @@ log "SRC=${SRC} -> APP_ROOT=${APP_ROOT}"
 
 _git_pull_if_branch() {
   if [[ "${CS_SKIP_GIT_PULL:-0}" == "1" ]]; then
-    log "CS_SKIP_GIT_PULL=1，跳过 git pull"
+    echo "[cs-publish] CS_SKIP_GIT_PULL=1，跳过 git pull"
     return 0
   fi
   local branch
@@ -30,7 +30,7 @@ _git_pull_if_branch() {
   if [[ -n "$branch" ]]; then
     git pull
   else
-    log "detached HEAD，跳过 git pull（已 checkout tag/commit）"
+    echo "[cs-publish] detached HEAD，跳过 git pull（已 checkout tag/commit）"
   fi
 }
 
