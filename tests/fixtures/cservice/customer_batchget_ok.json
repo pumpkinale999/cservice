@@ -1,0 +1,13 @@
+{
+  "errcode": 0,
+  "errmsg": "ok",
+  "customer_list": [
+    {
+      "external_userid": "wmTEST001",
+      "nickname": "测试客户",
+      "avatar": "http://example.com/avatar.png",
+      "gender": 1
+    }
+  ],
+  "invalid_external_userid": []
+}

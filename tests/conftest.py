@@ -80,6 +80,7 @@ def build_mock_wecom_client(
     sync_responses: list[dict[str, Any]] | None = None,
     trans_ok: bool = True,
     get_ok: bool = True,
+    customer_batchget_response: dict[str, Any] | None = None,
 ) -> MagicMock:
     client = MagicMock(spec=WecomKfClient)
     sync_responses = sync_responses or [load_json_fixture("sync_msg_text_inbound.json")]
@@ -100,6 +101,33 @@ def build_mock_wecom_client(
         from app.services.wecom_errors import CserviceWecomError
 
         client.service_state_trans.side_effect = CserviceWecomError(95014, "fail")
+    batchget_fixture = customer_batchget_response or load_json_fixture(
+        "customer_batchget_ok.json"
+    )
+
+    def _customer_batchget(external_userid_list: list[str], **kwargs: Any) -> dict[str, Any]:
+        by_id = {
+            row["external_userid"]: row
+            for row in batchget_fixture.get("customer_list") or []
+        }
+        customer_list = [
+            by_id[uid]
+            for uid in external_userid_list
+            if uid in by_id
+        ]
+        invalid = [
+            uid
+            for uid in external_userid_list
+            if uid not in by_id
+        ]
+        return {
+            "errcode": 0,
+            "errmsg": "ok",
+            "customer_list": customer_list,
+            "invalid_external_userid": invalid,
+        }
+
+    client.customer_batchget.side_effect = _customer_batchget
     client.send_text_msg = MagicMock()
     return client
 

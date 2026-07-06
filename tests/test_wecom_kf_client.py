@@ -51,3 +51,24 @@ def test_sync_msg_request_shape(wecom_env):
         assert data["msg_list"]
         assert captured["body"]["open_kfid"] == "wkTEST"
         assert captured["body"]["token"] == "T1"
+
+
+def test_customer_batchget_request_shape(wecom_env):
+    captured = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if "/gettoken" in str(request.url):
+            return httpx.Response(
+                200,
+                json={"errcode": 0, "access_token": "AT", "expires_in": 7200},
+            )
+        captured["path"] = request.url.path
+        captured["body"] = __import__("json").loads(request.content)
+        return httpx.Response(200, json=load_json_fixture("customer_batchget_ok.json"))
+
+    with WecomKfClient(http_client=httpx.Client(transport=httpx.MockTransport(handler))) as client:
+        data = client.customer_batchget(["wmTEST001"])
+        assert data["customer_list"][0]["nickname"] == "测试客户"
+        assert captured["path"] == "/cgi-bin/kf/customer/batchget"
+        assert captured["body"]["external_userid_list"] == ["wmTEST001"]
+        assert captured["body"]["need_enter_session_context"] == 0

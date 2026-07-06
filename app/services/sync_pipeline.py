@@ -9,8 +9,12 @@ from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
-from app.models import SyncState
+from app.models import Customer, SyncState
 from app.services.assign import assign_session_if_needed
+from app.services.customer_display import (
+    display_name_is_placeholder,
+    enrich_customer_display_names,
+)
 from app.services.ingress_filter import record_skipped_ingress, should_skip_customer_ingress
 from app.services.message_ingest import ingest_sync_message, message_item_scene
 from app.services.send_fail_handler import apply_msg_send_fail
@@ -82,6 +86,7 @@ def run_sync_for_kf(
             key=lambda m: int(m.get("send_time", 0)),
         )
         pending_uplink: _PendingUplink | None = None
+        customers_needing_display: dict[str, Customer] = {}
         for item in msg_list:
             if str(item.get("event_type") or "") == "msg_send_fail":
                 apply_msg_send_fail(db, item)
@@ -90,6 +95,8 @@ def run_sync_for_kf(
                 record_skipped_ingress(db, item, open_kfid)
                 continue
             csession, customer, is_new = ingest_sync_message(db, item, open_kfid)
+            if display_name_is_placeholder(customer):
+                customers_needing_display[customer.external_userid] = customer
             if not is_new:
                 continue
             external_userid = str(item.get("external_userid", customer.external_userid))
@@ -115,6 +122,11 @@ def run_sync_for_kf(
                         open_kfid=open_kfid,
                         external_userid=external_userid,
                     )
+        enrich_customer_display_names(
+            db,
+            client,
+            list(customers_needing_display.values()),
+        )
         db.commit()
 
         if pending_uplink is not None:

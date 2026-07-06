@@ -124,6 +124,22 @@ class WecomKfClient:
             },
         )
 
+    def customer_batchget(
+        self,
+        external_userid_list: list[str],
+        *,
+        need_enter_session_context: int = 0,
+    ) -> dict[str, Any]:
+        if not external_userid_list:
+            return {"errcode": 0, "errmsg": "ok", "customer_list": []}
+        return self._post_json(
+            "/cgi-bin/kf/customer/batchget",
+            {
+                "external_userid_list": external_userid_list,
+                "need_enter_session_context": need_enter_session_context,
+            },
+        )
+
     def send_text_msg(
         self,
         open_kfid: str,

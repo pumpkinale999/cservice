@@ -51,4 +51,5 @@ def test_uplink_body_is_rich(loaded_seed, wecom_env, monkeypatch):
         assert "【近期对话】" in body
         assert "【本轮待回复】" in body
         assert "【起草要求】" in body
+        assert "称呼「您」" in body
         assert body != "客户：你好，想咨询价格"
