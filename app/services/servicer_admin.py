@@ -1,4 +1,4 @@
-"""Kf servicer admin — DB + WeCom sync (M7 · §17.5)."""
+"""Kf servicer admin — DB (+ optional WeCom sync for non-API kf)."""
 
 from __future__ import annotations
 
@@ -104,7 +104,28 @@ def replace_servicers(
 
     db.flush()
 
+    # API 管理模式（D-CS-3）：接待名单仅 cservice DB · Tab/轮询/trans 用；
+    # 不调用企微「接待人员」后台 servicer/add|del（与 trans 分配 API 无关）。
+    if account.api_managed:
+        return _commit_servicers_db_only(db, open_kfid)
+
     return _sync_wecom_servicers(db, open_kfid, client)
+
+
+def _commit_servicers_db_only(db: Session, open_kfid: str) -> list[ServicerSyncResult]:
+    db_rows = list_servicers_for_kf(db, open_kfid)
+    results = [
+        ServicerSyncResult(
+            user_id=row.user_id,
+            servicer_userid=row.servicer_userid,
+            action="db",
+            errcode=0,
+            errmsg="ok",
+        )
+        for row in db_rows
+    ]
+    db.commit()
+    return results
 
 
 def _sync_wecom_servicers(

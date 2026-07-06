@@ -39,19 +39,12 @@ def test_is_participant_false(loaded_seed, monkeypatch):
     assert r.json()["is_participant"] is False
 
 
-def test_put_servicers_replaces_and_syncs(loaded_seed, monkeypatch):
+def test_put_servicers_api_managed_db_only(loaded_seed, monkeypatch):
+    """api_managed kf: persist cservice DB only — no WeCom servicer/add."""
     monkeypatch.setenv("CSERVICE_SERVICE_TOKEN", TOKEN)
     get_settings.cache_clear()
 
     mock_client = __import__("unittest.mock", fromlist=["MagicMock"]).MagicMock()
-    mock_client.servicer_list.return_value = {"errcode": 0, "servicer_list": []}
-    mock_client.servicer_add.return_value = {
-        "errcode": 0,
-        "result_list": [
-            {"userid": "lisi", "errcode": 0, "errmsg": "ok"},
-        ],
-    }
-    mock_client.servicer_del.return_value = {"errcode": 0, "result_list": []}
     mock_client.__enter__ = lambda self: self
     mock_client.__exit__ = lambda *args: None
 
@@ -69,7 +62,10 @@ def test_put_servicers_replaces_and_syncs(loaded_seed, monkeypatch):
     assert r.status_code == 200
     body = r.json()
     assert body["saved"] is True
-    assert len(body["result_list"]) >= 1
+    assert body["result_list"][0]["errcode"] == 0
+    mock_client.servicer_add.assert_not_called()
+    mock_client.servicer_del.assert_not_called()
+    mock_client.servicer_list.assert_not_called()
 
     r2 = client.get(
         "/api/v1/cservice/_internal/kf/wkTEST_MINIMAL/servicers",
@@ -80,9 +76,17 @@ def test_put_servicers_replaces_and_syncs(loaded_seed, monkeypatch):
     assert servicers[0]["user_id"] == "102"
 
 
-def test_put_servicers_wx_partial_failure(loaded_seed, monkeypatch):
+def test_put_servicers_wx_partial_failure_non_api_managed(loaded_seed, monkeypatch):
+    """Non-API kf still syncs WeCom servicer list (legacy path)."""
     monkeypatch.setenv("CSERVICE_SERVICE_TOKEN", TOKEN)
     get_settings.cache_clear()
+
+    from app.db import session_scope
+    from app.models import KfAccount
+
+    with session_scope() as db:
+        acc = db.get(KfAccount, "wkTEST_MINIMAL")
+        acc.api_managed = 0
 
     mock_client = __import__("unittest.mock", fromlist=["MagicMock"]).MagicMock()
     mock_client.servicer_list.return_value = {"errcode": 0, "servicer_list": []}
