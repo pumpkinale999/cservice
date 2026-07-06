@@ -34,6 +34,36 @@ def _delete_session(db: Session, session_id: str) -> None:
     db.query(CSession).filter_by(id=session_id).delete()
 
 
+def purge_by_display_names(db: Session, delete_names: set[str]) -> tuple[int, int]:
+    rows = (
+        db.query(CSession, Customer)
+        .join(Customer, CSession.customer_id == Customer.id)
+        .all()
+    )
+    deleted_sessions = 0
+    deleted_customers = 0
+    kept_customer_ids: set[str] = set()
+
+    for csession, customer in rows:
+        name = (customer.display_name or "").strip()
+        if name not in delete_names:
+            kept_customer_ids.add(customer.id)
+            continue
+        _delete_session(db, csession.id)
+        deleted_sessions += 1
+
+    for customer in db.query(Customer).all():
+        if customer.id in kept_customer_ids:
+            continue
+        remaining = db.query(CSession).filter_by(customer_id=customer.id).count()
+        if remaining == 0:
+            db.delete(customer)
+            deleted_customers += 1
+
+    db.commit()
+    return deleted_sessions, deleted_customers
+
+
 def purge_except_display_names(db: Session, keep_names: set[str]) -> tuple[int, int]:
     rows = (
         db.query(CSession, Customer)
@@ -72,8 +102,15 @@ def main() -> int:
         "--keep-display-name",
         action="append",
         dest="keep_names",
-        required=True,
+        default=[],
         help="Customer display_name to keep (repeatable)",
+    )
+    parser.add_argument(
+        "--delete-display-name",
+        action="append",
+        dest="delete_names",
+        default=[],
+        help="Customer display_name to delete (repeatable)",
     )
     parser.add_argument(
         "--dry-run",
@@ -82,8 +119,12 @@ def main() -> int:
     )
     args = parser.parse_args()
     keep_names = {n.strip() for n in args.keep_names if n.strip()}
-    if not keep_names:
-        print("error: no keep names", file=sys.stderr)
+    delete_names = {n.strip() for n in args.delete_names if n.strip()}
+    if not keep_names and not delete_names:
+        print("error: specify --keep-display-name and/or --delete-display-name", file=sys.stderr)
+        return 1
+    if keep_names and delete_names:
+        print("error: use either --keep-display-name or --delete-display-name, not both", file=sys.stderr)
         return 1
 
     init_db()
@@ -95,16 +136,28 @@ def main() -> int:
             .join(Customer, CSession.customer_id == Customer.id)
             .all()
         )
-        to_delete = [
-            (csession.id, customer.display_name, customer.external_userid)
-            for csession, customer in rows
-            if (customer.display_name or "").strip() not in keep_names
-        ]
-        to_keep = [
-            (csession.id, customer.display_name, customer.external_userid)
-            for csession, customer in rows
-            if (customer.display_name or "").strip() in keep_names
-        ]
+        if delete_names:
+            to_delete = [
+                (csession.id, customer.display_name, customer.external_userid)
+                for csession, customer in rows
+                if (customer.display_name or "").strip() in delete_names
+            ]
+            to_keep = [
+                (csession.id, customer.display_name, customer.external_userid)
+                for csession, customer in rows
+                if (customer.display_name or "").strip() not in delete_names
+            ]
+        else:
+            to_delete = [
+                (csession.id, customer.display_name, customer.external_userid)
+                for csession, customer in rows
+                if (customer.display_name or "").strip() not in keep_names
+            ]
+            to_keep = [
+                (csession.id, customer.display_name, customer.external_userid)
+                for csession, customer in rows
+                if (customer.display_name or "").strip() in keep_names
+            ]
         print(f"keep ({len(to_keep)}):")
         for sid, name, ext in to_keep:
             print(f"  {sid} name={name!r} ext={ext}")
@@ -113,7 +166,10 @@ def main() -> int:
             print(f"  {sid} name={name!r} ext={ext}")
         if args.dry_run:
             return 0
-        deleted_sessions, deleted_customers = purge_except_display_names(db, keep_names)
+        if delete_names:
+            deleted_sessions, deleted_customers = purge_by_display_names(db, delete_names)
+        else:
+            deleted_sessions, deleted_customers = purge_except_display_names(db, keep_names)
         print(f"done: deleted_sessions={deleted_sessions} deleted_customers={deleted_customers}")
     except Exception as exc:
         db.rollback()

@@ -18,10 +18,8 @@ from app.models import Customer, Draft, Message, Session as CSession  # noqa: E4
 from app.services.seed import load_seed_file  # noqa: E402
 
 OPEN_KFID = "wkTEST_MINIMAL"
-DEMO_CUSTOMERS = (
-    ("wm_demo_001", "李女士", "想了解一下产品价格", 1),
-    ("wm_demo_002", "王先生", "售后问题咨询", 0),
-)
+# Demo customers removed from default loader; use explicit fixtures in tests instead.
+DEMO_CUSTOMERS: tuple[tuple[str, str, str, int], ...] = ()
 
 
 def _upsert_demo(db, *, servicer: str) -> int:
