@@ -187,6 +187,13 @@ class WecomKfClient:
             {"open_kfid": open_kfid, "userid_list": userid_list},
         )
 
+    def groupchat_get(self, chat_id: str) -> dict[str, Any]:
+        """Fetch customer group detail (name, members) by chat_id."""
+        return self._post_json(
+            "/cgi-bin/externalcontact/groupchat/get",
+            {"chat_id": chat_id, "need_name": 0},
+        )
+
 
 def reset_token_cache() -> None:
     global _TOKEN_CACHE

@@ -18,6 +18,7 @@ from app.models import (
     WgSession,
 )
 from app.services.wg_badge import on_text_inbound
+from app.services.wg_group_display import refresh_group_display_name
 from app.services.wg_uplink_hook import trigger_wg_uplink_after_ingress
 from app.services.wg_ingress_filter import is_non_text_ingress, log_non_text_ignored
 
@@ -217,6 +218,11 @@ def handle_wecom_group_ingress(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="unknown_group",
         ) from exc
+
+    from app.services.wecom_kf_client import WecomKfClient
+
+    with WecomKfClient(cfg) as wecom_client:
+        refresh_group_display_name(group, payload, client=wecom_client)
 
     session = _get_or_create_open_session(db, chatid)
     text = _extract_text(payload)

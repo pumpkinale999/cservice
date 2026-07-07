@@ -6,6 +6,8 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.models import WgGroup, WgMessage, WgSession
+from app.services.wecom_kf_client import WecomKfClient
+from app.services.wg_group_display import enrich_group_display_names
 
 
 def _last_message_preview(db: Session, session_id: str) -> str | None:
@@ -30,6 +32,10 @@ def list_open_group_sessions(db: Session) -> list[dict]:
         .order_by(desc(WgSession.last_activity_at))
         .all()
     )
+    groups = [group for _, group in rows]
+    with WecomKfClient() as client:
+        enrich_group_display_names(db, client, groups)
+
     out: list[dict] = []
     for session, group in rows:
         out.append(

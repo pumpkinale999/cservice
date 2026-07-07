@@ -239,6 +239,7 @@ def list_groups(
     db = factory()
     try:
         items = list_open_group_sessions(db)
+        db.commit()
         return {"groups": items}
     finally:
         db.close()

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi.testclient import TestClient
+from unittest.mock import patch
 
 from app.config import get_settings
 from app.db import get_session_factory
@@ -59,9 +60,14 @@ def test_ingress_auto_register_list_visible_cs41(tmp_cservice_db, monkeypatch):
     payload.pop("group_display_name", None)
 
     client = TestClient(app)
-    r = client.post(INGRESS_URL, json=payload, headers=HEADERS)
+    with patch(
+        "app.services.wg_group_display.fetch_groupchat_name",
+        return_value="自动同步群名",
+    ):
+        r = client.post(INGRESS_URL, json=payload, headers=HEADERS)
     assert r.status_code == 200
     assert r.json()["auto_registered"] is True
+    assert r.json()["group_display_name"] == "自动同步群名"
 
     factory = get_session_factory()
     db = factory()
@@ -70,7 +76,7 @@ def test_ingress_auto_register_list_visible_cs41(tmp_cservice_db, monkeypatch):
         chatids = {row["chatid"] for row in rows}
         assert "wrNEWGROUP99" in chatids
         row = next(r for r in rows if r["chatid"] == "wrNEWGROUP99")
-        assert row["group_display_name"] == "群·WGROUP99"
+        assert row["group_display_name"] == "自动同步群名"
         assert row["pending_reply_count"] == 1
     finally:
         db.close()
