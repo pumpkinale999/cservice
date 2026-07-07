@@ -11,7 +11,7 @@ from app.services.wecom_errors import CserviceWecomError
 
 
 class WecomAibotClient:
-    """POST active `response_url` with text payload — no WSS / access_token."""
+    """POST active `response_url` with markdown payload — no WSS / access_token."""
 
     def __init__(
         self,
@@ -52,7 +52,8 @@ class WecomAibotClient:
         if self.settings.cservice_demo_outbound:
             return {"errcode": 0, "errmsg": "ok", "demo": True}
 
-        body = {"msgtype": "text", "text": {"content": content}}
+        # WeCom response_url API accepts markdown (not text) — see path/101138.
+        body = {"msgtype": "markdown", "markdown": {"content": content}}
         resp = self._client().post(url, json=body)
         try:
             data = resp.json()

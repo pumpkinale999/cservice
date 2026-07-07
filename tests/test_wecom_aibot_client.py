@@ -47,7 +47,7 @@ def test_post_response_http_success():
     assert result["errcode"] == 0
     mock_http.post.assert_called_once_with(
         "https://example.com/r",
-        json={"msgtype": "text", "text": {"content": "hi there"}},
+        json={"msgtype": "markdown", "markdown": {"content": "hi there"}},
     )
 
 
