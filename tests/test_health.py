@@ -76,3 +76,22 @@ def test_health_open_kfid_count_after_seed(tmp_cservice_db):
     client = TestClient(app)
     body = client.get("/api/v1/cservice/health").json()
     assert body["open_kfid_count"] == 1
+
+
+def test_health_wecom_group_ingress_disabled(tmp_cservice_db):
+    client = TestClient(app)
+    body = client.get("/api/v1/cservice/health").json()
+    assert body["wecom_group_ingress"] is False
+    assert body["wecom_group_assistant_gateway"] is False
+
+
+def test_health_wecom_group_ingress_enabled(tmp_cservice_db, monkeypatch):
+    from app.config import get_settings
+
+    monkeypatch.setenv("CSERVICE_WG_ENABLED", "1")
+    get_settings.cache_clear()
+    client = TestClient(app)
+    body = client.get("/api/v1/cservice/health").json()
+    assert body["wecom_group_ingress"] is True
+    assert body["wecom_group_assistant_gateway"] is False
+    get_settings.cache_clear()

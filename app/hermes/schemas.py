@@ -1,4 +1,4 @@
-"""WSS frame schemas (§22.3)."""
+"""WSS frame schemas (§22.3 · P4 §13)."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ class GatewayRegister:
             return None
         role = str(data.get("gateway_role", "")).strip()
         slug = str(data.get("agent_slug", "")).strip()
-        if role != "cservice" or not slug:
+        if role not in ("cservice", "cservice-group") or not slug:
             return None
         return cls(
             gateway_role=role,
@@ -76,13 +76,68 @@ class CserviceCustomerUplink:
 
 
 @dataclass(frozen=True)
+class CserviceGroupUplink:
+    thread_id: int
+    session_id: str
+    ibot_id: str
+    chatid: str
+    body: str
+    trigger_source_msgid: str
+    protocol_version: int = 1
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "type": "cservice_group_uplink",
+            "protocol_version": self.protocol_version,
+            "thread_id": self.thread_id,
+            "session_id": self.session_id,
+            "ibot_id": self.ibot_id,
+            "chatid": self.chatid,
+            "body": self.body,
+            "trigger_source_msgid": self.trigger_source_msgid,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CserviceGroupUplink | None:
+        if data.get("type") != "cservice_group_uplink":
+            return None
+        try:
+            thread_id = int(data["thread_id"])
+        except (KeyError, TypeError, ValueError):
+            return None
+        session_id = str(data.get("session_id", "")).strip()
+        ibot_id = str(data.get("ibot_id", "")).strip()
+        chatid = str(data.get("chatid", "")).strip()
+        body = str(data.get("body", ""))
+        trigger = str(
+            data.get("trigger_source_msgid") or data.get("trigger_wx_msgid") or ""
+        ).strip()
+        if not session_id or not trigger or not chatid:
+            return None
+        return cls(
+            thread_id=thread_id,
+            session_id=session_id,
+            ibot_id=ibot_id,
+            chatid=chatid,
+            body=body,
+            trigger_source_msgid=trigger,
+            protocol_version=int(data.get("protocol_version", 1)),
+        )
+
+
+@dataclass(frozen=True)
 class CserviceDraftReply:
     thread_id: int
     session_id: str
     body: str
     stream_status: Literal["final", "failed"]
     trigger_wx_msgid: str | None = None
+    trigger_source_msgid: str | None = None
     protocol_version: int = 1
+
+    @property
+    def trigger_id(self) -> str | None:
+        return self.trigger_source_msgid or self.trigger_wx_msgid
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> CserviceDraftReply | None:
@@ -99,14 +154,17 @@ class CserviceDraftReply:
             return None
         if not session_id:
             return None
-        trigger = data.get("trigger_wx_msgid")
-        trigger_wx_msgid = str(trigger).strip() if trigger else None
+        trigger_wx = data.get("trigger_wx_msgid")
+        trigger_src = data.get("trigger_source_msgid")
+        trigger_wx_msgid = str(trigger_wx).strip() if trigger_wx else None
+        trigger_source_msgid = str(trigger_src).strip() if trigger_src else None
         return cls(
             thread_id=thread_id,
             session_id=session_id,
             body=body,
             stream_status=stream_status,  # type: ignore[arg-type]
             trigger_wx_msgid=trigger_wx_msgid,
+            trigger_source_msgid=trigger_source_msgid,
             protocol_version=int(data.get("protocol_version", 1)),
         )
 

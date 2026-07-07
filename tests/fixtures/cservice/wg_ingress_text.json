@@ -1,0 +1,10 @@
+{
+  "ibot_id": "ibot_test_001",
+  "chatid": "wrGROUP001",
+  "chattype": "group",
+  "msgid": "msg_wg_001",
+  "sender_userid": "user_alice",
+  "text": "@数坤坤健康助手 请问体检报告怎么看？",
+  "response_url": "https://qyapi.weixin.qq.com/cgi-bin/aibot/response?key=test",
+  "group_display_name": "测试健康群"
+}

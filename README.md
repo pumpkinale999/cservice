@@ -133,8 +133,11 @@ curl -H "Authorization: Bearer $JWT" http://127.0.0.1:8000/api/v1/cservice/custo
 ./scripts/verify_cservice_m3.sh   # M3 · CS-04/08/12
 ./scripts/verify_cservice_m4.sh   # M4 · CS-02/06/07/13/16
 ./scripts/verify_cservice_m6.sh   # M6 · CS-19–24
-# skstudio 侧：verify_cservice_m6_ui.sh · verify_cservice_m6.sh（编排）
+./scripts/verify_cservice_p4_m1.sh   # P4-M1
+./scripts/verify_cservice_p4_m2.sh   # P4-M2 · CS-30–34/38/39
+# skstudio：verify_cservice_p4_m3.sh · verify_cservice_p4_m4.sh（M3+M4 编排）
 # 生产 CS-25 步骤 1：deploy/ubuntu/cs-deploy.sh verify-m6
+# 生产 CS-33 步骤 1：deploy/ubuntu/cs-deploy.sh verify-p4-m4 · skstudio verify_cservice_p4_m4_health.sh
 pytest -q
 ```
 

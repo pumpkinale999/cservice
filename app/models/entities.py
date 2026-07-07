@@ -231,3 +231,163 @@ class EventLog(Base):
     external_userid: Mapped[str | None] = mapped_column(String(64), nullable=True)
     payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class WgGroup(Base):
+    __tablename__ = "cservice_wg_group"
+
+    chatid: Mapped[str] = mapped_column(String(128), primary_key=True)
+    ibot_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    display_name: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(Text, nullable=False, default="active")
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    sessions: Mapped[list[WgSession]] = relationship("WgSession", back_populates="group")
+    reply_anchor: Mapped[WgReplyAnchor | None] = relationship(
+        "WgReplyAnchor",
+        back_populates="group",
+        uselist=False,
+    )
+    agent_thread: Mapped[WgAgentThread | None] = relationship(
+        "WgAgentThread",
+        back_populates="group",
+        uselist=False,
+    )
+
+
+class WgSession(Base):
+    __tablename__ = "cservice_wg_session"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    chatid: Mapped[str] = mapped_column(
+        String(128),
+        ForeignKey("cservice_wg_group.chatid"),
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(Text, nullable=False, default="open")
+    pending_reply_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_activity_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    group: Mapped[WgGroup] = relationship("WgGroup", back_populates="sessions")
+    messages: Mapped[list[WgMessage]] = relationship("WgMessage", back_populates="session")
+    drafts: Mapped[list[WgDraft]] = relationship("WgDraft", back_populates="session")
+
+
+class WgAgentThread(Base):
+    __tablename__ = "cservice_wg_agent_thread"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ibot_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    chatid: Mapped[str] = mapped_column(
+        String(128),
+        ForeignKey("cservice_wg_group.chatid"),
+        nullable=False,
+    )
+    hermes_profile: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        default="cservice-group-assistant",
+    )
+    uplink_pending: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    uplink_started_at: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    group: Mapped[WgGroup] = relationship("WgGroup", back_populates="agent_thread")
+
+    __table_args__ = (
+        UniqueConstraint("ibot_id", "chatid", name="uq_wg_agent_thread_ibot_chatid"),
+    )
+
+
+class WgMessage(Base):
+    __tablename__ = "cservice_wg_message"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    session_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("cservice_wg_session.id"),
+        nullable=False,
+    )
+    direction: Mapped[str] = mapped_column(Text, nullable=False)
+    source_msgid: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
+    msg_type: Mapped[str] = mapped_column(Text, nullable=False, default="text")
+    content: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sender_userid: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    sender_type: Mapped[str | None] = mapped_column(Text, nullable=True)
+    draft_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    delivery_status: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    session: Mapped[WgSession] = relationship("WgSession", back_populates="messages")
+
+
+class WgDraft(Base):
+    __tablename__ = "cservice_wg_draft"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    session_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("cservice_wg_session.id"),
+        nullable=False,
+    )
+    agent_text: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(Text, nullable=False, default="pending")
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    superseded_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    session: Mapped[WgSession] = relationship("WgSession", back_populates="drafts")
+
+
+class WgAuditLog(Base):
+    __tablename__ = "cservice_wg_audit_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    actor_user_id: Mapped[str | None] = mapped_column(Text, nullable=True)
+    chatid: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    session_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    action: Mapped[str] = mapped_column(Text, nullable=False)
+    draft_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    edited_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class WgReplyAnchor(Base):
+    __tablename__ = "cservice_wg_reply_anchor"
+
+    chatid: Mapped[str] = mapped_column(
+        String(128),
+        ForeignKey("cservice_wg_group.chatid"),
+        primary_key=True,
+    )
+    response_url: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[str] = mapped_column(Text, nullable=False)
+    source_msgid: Mapped[str] = mapped_column(String(128), nullable=False)
+    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    group: Mapped[WgGroup] = relationship("WgGroup", back_populates="reply_anchor")
+
+
+class WgIngressDedup(Base):
+    __tablename__ = "cservice_wg_ingress_dedup"
+
+    dedup_key: Mapped[str] = mapped_column(String(256), primary_key=True)
+    processed_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class WgUplinkRetry(Base):
+    __tablename__ = "cservice_wg_uplink_retry"
+
+    session_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("cservice_wg_session.id"),
+        primary_key=True,
+    )
+    thread_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    trigger_source_msgid: Mapped[str] = mapped_column(Text, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    ibot_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    chatid: Mapped[str] = mapped_column(String(128), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    next_retry_at: Mapped[str | None] = mapped_column(Text, nullable=True)
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)

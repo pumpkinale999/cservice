@@ -15,6 +15,15 @@ from app.models.entities import (
     SyncState,
     UplinkRetry,
     WebhookDedup,
+    WgAgentThread,
+    WgAuditLog,
+    WgDraft,
+    WgGroup,
+    WgIngressDedup,
+    WgMessage,
+    WgReplyAnchor,
+    WgSession,
+    WgUplinkRetry,
 )
 
 __all__ = [
@@ -32,4 +41,13 @@ __all__ = [
     "SyncState",
     "UplinkRetry",
     "WebhookDedup",
+    "WgAgentThread",
+    "WgAuditLog",
+    "WgDraft",
+    "WgGroup",
+    "WgIngressDedup",
+    "WgMessage",
+    "WgReplyAnchor",
+    "WgSession",
+    "WgUplinkRetry",
 ]

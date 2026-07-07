@@ -283,6 +283,13 @@ verify_health() {
           || die "hermes_cservice_gateway!=true — 请启动 hermes-gateway-cservice-assistant"
         log "✓ hermes_cservice_gateway=true"
       fi
+      if [[ "${CSERVICE_VERIFY_GROUP_GW:-0}" == "1" ]]; then
+        echo "$out" | grep -q '"wecom_group_ingress"[[:space:]]*:[[:space:]]*true' \
+          || die "wecom_group_ingress!=true — 请设置 CSERVICE_WG_ENABLED=1"
+        echo "$out" | grep -q '"wecom_group_assistant_gateway"[[:space:]]*:[[:space:]]*true' \
+          || die "wecom_group_assistant_gateway!=true — 请启动 hermes-gateway-cservice-group-assistant"
+        log "✓ wecom_group_ingress + wecom_group_assistant_gateway=true"
+      fi
       return 0
     fi
     sleep 1
@@ -321,8 +328,10 @@ usage() {
   purge-sessions <display_name>  删除除指定客户外的全部会话（运维清理）
   health       仅 curl /api/v1/cservice/health（CSERVICE_VERIFY_GW=1 时断言 GW）
   verify-m6    CS-25 步骤 1：health + hermes_cservice_gateway（同 CSERVICE_VERIFY_GW=1）
+  verify-p4-m4 CS-33 步骤 1：health + wecom_group_*（CSERVICE_VERIFY_GROUP_GW=1）
 
 环境变量: APP_ROOT CS_PORT CS_USER SKSTUDIO_ENV CSERVICE_DEMO_SERVICERS CSERVICE_LOAD_DEMO_UI
+  群通道（路径 A）：CSERVICE_WG_ENABLED=1 · CSERVICE_WG_AUTO_REGISTER=1 · CSERVICE_WG_BROADCAST_ENABLED=0
 EOF
 }
 
@@ -336,6 +345,7 @@ main() {
     purge-sessions) purge_sessions "${2:-}" ;;
     health) verify_health ;;
     verify-m6) CSERVICE_VERIFY_GW=1 verify_health ;;
+    verify-p4-m4) CSERVICE_VERIFY_GROUP_GW=1 verify_health ;;
     -h|--help|help) usage ;;
     *) die "用法: $0 bootstrap|configure|deploy|health|demo|purge-sessions" ;;
   esac

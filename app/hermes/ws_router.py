@@ -15,6 +15,7 @@ from app.hermes.deps import verify_adapter_bearer
 from app.hermes.downlink_handler import apply_draft_downlink
 from app.hermes.schemas import GatewayRegister, parse_business_frame
 from app.hermes.uplink_queue import flush_pending_uplinks
+from app.hermes.wg_uplink_queue import flush_pending_wg_uplinks
 
 logger = logging.getLogger(__name__)
 
@@ -59,12 +60,17 @@ async def cservice_hermes_websocket(ws: WebSocket) -> None:
 
             reg = GatewayRegister.from_dict(data)
             if reg is not None:
-                connection_registry.apply_gateway_register(ws, agent_slug=reg.agent_slug)
+                connection_registry.apply_gateway_register(
+                    ws,
+                    agent_slug=reg.agent_slug,
+                    gateway_role=reg.gateway_role,
+                )
                 await ws.send_text(json.dumps({"type": "gateway_register_ok"}))
                 factory = get_session_factory()
                 db = factory()
                 try:
                     await flush_pending_uplinks(db, force_all=True)
+                    await flush_pending_wg_uplinks(db, force_all=True)
                     db.commit()
                 finally:
                     db.close()

@@ -17,6 +17,7 @@ from app.services.servicer_admin import (
     replace_servicers,
 )
 from app.services.wecom_kf_client import WecomKfClient
+from app.services.wg_ingress_service import WgIngressDisabledError, handle_wecom_group_ingress
 
 router = APIRouter(prefix="/cservice/_internal", tags=["cservice-internal"])
 
@@ -29,6 +30,21 @@ class ServicerItemIn(BaseModel):
 
 class PutServicersBody(BaseModel):
     servicers: list[ServicerItemIn] = Field(default_factory=list)
+
+
+class WecomGroupIngressBody(BaseModel):
+    ibot_id: str
+    chatid: str
+    chattype: str = "group"
+    msgid: str
+    sender_userid: str
+    text: str
+    response_url: str
+    reply_req_id: str | None = None
+    group_display_name: str | None = None
+    expires_at: str | None = None
+    msgtype: str | None = None
+    raw: dict[str, Any] | None = None
 
 
 @router.get("/auth-check")
@@ -128,6 +144,34 @@ def put_kf_servicers(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         ) from exc
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
+@router.post("/wecom-group/ingress")
+def post_wecom_group_ingress(
+    body: WecomGroupIngressBody,
+    _: Annotated[None, Depends(verify_service_token)],
+) -> dict[str, Any]:
+    factory = get_session_factory()
+    db = factory()
+    try:
+        payload = body.model_dump(exclude_none=True)
+        result = handle_wecom_group_ingress(db, payload)
+        db.commit()
+        return result
+    except WgIngressDisabledError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="wg_disabled",
+        ) from exc
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception:
         db.rollback()
         raise

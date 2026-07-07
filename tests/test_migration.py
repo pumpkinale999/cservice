@@ -47,3 +47,31 @@ def test_migration_m6_columns(tmp_cservice_db):
     thread_cols = {c["name"] for c in insp.get_columns("cservice_agent_thread")}
     assert "uplink_pending" in thread_cols
     assert "uplink_started_at" in thread_cols
+
+
+P4_WG_TABLES = (
+    "cservice_wg_group",
+    "cservice_wg_session",
+    "cservice_wg_message",
+    "cservice_wg_draft",
+    "cservice_wg_audit_log",
+    "cservice_wg_agent_thread",
+    "cservice_wg_reply_anchor",
+    "cservice_wg_ingress_dedup",
+    "cservice_wg_uplink_retry",
+)
+
+
+def test_migration_p4_wg_tables(tmp_cservice_db):
+    from sqlalchemy import inspect
+
+    from app.db import get_engine
+
+    for name in P4_WG_TABLES:
+        assert table_exists(name), name
+
+    insp = inspect(get_engine())
+    thread_cols = {c["name"] for c in insp.get_columns("cservice_wg_agent_thread")}
+    assert {"ibot_id", "chatid", "uplink_pending"}.issubset(thread_cols)
+    uqs = insp.get_unique_constraints("cservice_wg_agent_thread")
+    assert any(set(uq.get("column_names") or []) == {"ibot_id", "chatid"} for uq in uqs)

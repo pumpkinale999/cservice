@@ -23,12 +23,21 @@ class Settings(BaseSettings):
     cservice_kf_callback_aes_key: str = ""
     cservice_demo_outbound: bool = False
     cservice_hermes_ws_path: str = "/ws/hermes"
+    cservice_wg_enabled: bool = False
+    cservice_wg_auto_register: bool = True
+    cservice_wg_broadcast_enabled: bool = False
     host: str = "127.0.0.1"
     port: int = 8093
 
-    @field_validator("cservice_demo_outbound", mode="before")
+    @field_validator(
+        "cservice_demo_outbound",
+        "cservice_wg_enabled",
+        "cservice_wg_auto_register",
+        "cservice_wg_broadcast_enabled",
+        mode="before",
+    )
     @classmethod
-    def _coerce_demo_outbound(cls, v: object) -> bool:
+    def _coerce_bool_flag(cls, v: object) -> bool:
         if isinstance(v, bool):
             return v
         if v is None:
