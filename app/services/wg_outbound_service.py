@@ -11,7 +11,9 @@ from sqlalchemy.orm import Session
 
 from app.models import WgAuditLog, WgDraft, WgMessage, WgReplyAnchor, WgSession
 from app.services.wecom_aibot_client import WecomAibotClient
+from app.services.wecom_error_detail import raise_for_wecom_error
 from app.services.wecom_errors import CserviceWecomError
+from app.services.wg_wss_outbound import send_group_via_wss
 from app.services.wg_badge import on_round_cover_outbound
 
 
@@ -118,10 +120,7 @@ def _call_post_response(client: WecomAibotClient, response_url: str, content: st
     try:
         return client.post_response(response_url, content)
     except CserviceWecomError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail={"code": "wecom_error", "errcode": exc.errcode, "errmsg": exc.errmsg},
-        ) from exc
+        raise_for_wecom_error(exc)
 
 
 def _write_audit(
@@ -310,10 +309,11 @@ def send_wg_manual(
     text: str,
     client: WecomAibotClient,
 ) -> dict[str, Any]:
+    """UI 人工直发（trigger=manual）：走主动发送 WSS，不复用 response_url。"""
     csession = _get_session_for_send(db, session_id)
     content = _validate_text(text)
-    anchor = _get_anchor(db, csession.chatid)
-    _call_post_response(client, anchor.response_url, content)
+    _get_anchor(db, csession.chatid)
+    send_group_via_wss(csession.chatid, content)
 
     now = _now()
     msg = WgMessage(

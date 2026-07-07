@@ -126,6 +126,67 @@ class CserviceGroupUplink:
 
 
 @dataclass(frozen=True)
+class CserviceGroupSend:
+    """群主动发送请求帧（manual / cron / alert 共用传输层）。"""
+
+    request_id: str
+    chatid: str
+    content: str
+    protocol_version: int = 1
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "type": "cservice_group_send",
+            "protocol_version": self.protocol_version,
+            "request_id": self.request_id,
+            "chatid": self.chatid,
+            "content": self.content,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CserviceGroupSend | None:
+        if data.get("type") != "cservice_group_send":
+            return None
+        request_id = str(data.get("request_id") or "").strip()
+        chatid = str(data.get("chatid") or "").strip()
+        content = str(data.get("content") or "")
+        if not request_id or not chatid or not content.strip():
+            return None
+        return cls(
+            request_id=request_id,
+            chatid=chatid,
+            content=content,
+            protocol_version=int(data.get("protocol_version", 1)),
+        )
+
+
+@dataclass(frozen=True)
+class CserviceGroupSendResult:
+    request_id: str
+    ok: bool
+    code: str = ""
+    errcode: int | None = None
+    errmsg: str = ""
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CserviceGroupSendResult | None:
+        if data.get("type") != "cservice_group_send_result":
+            return None
+        request_id = str(data.get("request_id") or "").strip()
+        if not request_id:
+            return None
+        errcode_raw = data.get("errcode")
+        errcode = int(errcode_raw) if errcode_raw is not None else None
+        return cls(
+            request_id=request_id,
+            ok=bool(data.get("ok")),
+            code=str(data.get("code") or "").strip(),
+            errcode=errcode,
+            errmsg=str(data.get("errmsg") or "").strip(),
+        )
+
+
+@dataclass(frozen=True)
 class CserviceDraftReply:
     thread_id: int
     session_id: str

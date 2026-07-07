@@ -91,6 +91,12 @@ async def cservice_hermes_websocket(ws: WebSocket) -> None:
                 await connection_registry.drain_outbound()
                 continue
 
+            from app.hermes.group_send_coordinator import resolve_group_send_result
+
+            if resolve_group_send_result(data):
+                await connection_registry.drain_outbound()
+                continue
+
             await ws.send_text(json.dumps({"type": "error", "detail": "unknown type"}))
             await connection_registry.drain_outbound()
     except WebSocketDisconnect:
