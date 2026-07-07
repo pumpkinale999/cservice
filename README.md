@@ -42,7 +42,7 @@ WeCom **微信客服** backend — independent repo/process (同构 [`knowledge_
 - [`skstudio`](https://github.com/pumpkinale999/skstudio) `frontend/src/cservice/` · 底 Tab「客服」· `/cservice/*`
 - BFF：`GET /api/v1/cservice/health` · `auth/config.cservice_enabled`
 - 门禁：[`skstudio/scripts/verify_cservice_m5.sh`](https://github.com/pumpkinale999/skstudio/blob/main/scripts/verify_cservice_m5.sh) · E2E `e2e/cservice/happy-path.spec.ts`（CS-17）
-- 产品规格：[skstudio/docs/cservice-产品设计.md](https://github.com/pumpkinale999/skstudio/blob/main/docs/cservice-产品设计.md) **v0.9.7** · §0.2 MVP closure **已达成**
+- 产品规格：[platform-docs/cservice-产品设计.md](https://github.com/pumpkinale999/platform-docs/blob/main/cservice-产品设计.md) **v0.9.7** · §0.2 MVP closure **已达成**
 
 **M6 · 客服助手闭环 ✅（后端 + skstudio UI）**
 
