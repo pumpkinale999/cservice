@@ -286,9 +286,7 @@ verify_health() {
       if [[ "${CSERVICE_VERIFY_GROUP_GW:-0}" == "1" ]]; then
         echo "$out" | grep -q '"wecom_group_ingress"[[:space:]]*:[[:space:]]*true' \
           || die "wecom_group_ingress!=true — 请设置 CSERVICE_WG_ENABLED=1"
-        echo "$out" | grep -q '"wecom_group_assistant_gateway"[[:space:]]*:[[:space:]]*true' \
-          || die "wecom_group_assistant_gateway!=true — 请启动 hermes-gateway-cservice-group-assistant"
-        log "✓ wecom_group_ingress + wecom_group_assistant_gateway=true"
+        log "✓ wecom_group_ingress=true（群 ingress 复用 cservice-assistant GW）"
       fi
       return 0
     fi
