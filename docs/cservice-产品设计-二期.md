@@ -2,7 +2,7 @@
 
 - **文档类型**：~~二期产品共识 + 架构验收真源~~ → **历史存档**
 - **版本**：**v0.3.8**
-- **状态**：**废止为运行真源**（2026-07-31 · 随 cservice **P0** 一并拆除）· 见 [平台控制面与Postgres迁移共识.md](./平台控制面与Postgres迁移共识.md) **D1/D19** · 一期历史 [cservice-产品设计.md](./cservice-产品设计.md)
+- **状态**：**废止为运行真源**（2026-07-31 · 随 cservice **P0** 一并拆除）· 见 [平台控制面与Postgres迁移共识.md](../../platform_docs/平台控制面与Postgres迁移共识.md) **D1/D19** · 一期历史 [cservice-产品设计.md](./cservice-产品设计.md)
 - **产品定位（历史）**：企微客户群 · 多对1 · 与一期 kf 同构的人机协同
 
 **关联文档**
@@ -10,8 +10,8 @@
 | 文档 | 用途 |
 | ---- | ---- |
 | [cservice-产品设计.md](./cservice-产品设计.md) | **一期真源**：微信客服 kf · 1:1 · M1–M7 |
-| [TODO.md](./TODO.md) | 实现勾选 · [§ P4](./TODO.md#cservice-p4) |
-| [Personal-Assistant产品设计.md](./Personal-Assistant产品设计.md) | Hermes profile / `gateway_role` 隔离 |
+| [TODO.md](../../platform_docs/TODO.md) | 实现勾选 · [§ P4](../../platform_docs/TODO.md#cservice-p4) |
+| [Personal-Assistant产品设计.md](../../platform_docs/hermes-self/Personal-Assistant产品设计.md) | Hermes profile / `gateway_role` 隔离 |
 | [企微 · 智能机器人 · 接收消息](https://developer.work.weixin.qq.com/document/path/100719) | `aibot_*` 回调 · 群 `chatid` |
 | [企微 · 智能机器人 · 主动回复](https://developer.work.weixin.qq.com/document/path/101138) | `response_url` · 群 reply 模式 |
 

@@ -2,13 +2,13 @@
 
 本文档合并 **产品需求**、**技术实现要点** 与 **测评验收**，适用于 skstudio 一期 **「每群（thread）一个固定 Bot」** 能力；**不包含** Hermes、skstudio-hermes、适配器协议等（见文末「后续阶段」）。
 
-> **与「数字员工」的边界（2026-08-05）**：本文 **Thread Bot**（`users.is_bot` · IM @ / 下行路由）**不是**权限系统中的 **数字员工授权主体**。后者真源：[数字员工与Actor身份共识.md](./数字员工与Actor身份共识.md)。二者不得混用 ACL `subject_id`。
+> **与「数字员工」的边界（2026-08-05）**：本文 **Thread Bot**（`users.is_bot` · IM @ / 下行路由）**不是**权限系统中的 **数字员工授权主体**。后者真源：[数字员工与Actor身份共识.md](../../platform_docs/数字员工与Actor身份共识.md)。二者不得混用 ACL `subject_id`。
 
 **关联文档**：
 
-- [`用户需求.md`](用户需求.md)（群 / thread、成员、侧栏）  
-- [`技术设计.md`](技术设计.md)（数据模型、API、WS）  
-- [`数字员工与Actor身份共识.md`](数字员工与Actor身份共识.md)（人类 / 数字员工 Actor · 代行 vs 履职）  
+- [`用户需求.md`](../../platform_docs/用户需求.md)（群 / thread、成员、侧栏）  
+- [`技术设计.md`](../../platform_docs/技术设计.md)（数据模型、API、WS）  
+- [`数字员工与Actor身份共识.md`](../../platform_docs/数字员工与Actor身份共识.md)（人类 / 数字员工 Actor · 代行 vs 履职）  
 - [`Hermes与skstudio集成(一期).md`](Hermes与skstudio集成(一期).md)（Hermes / skstudio-hermes；**@ Bot 触发** 见该文档 **§2.6**）
 
 ---
@@ -21,7 +21,7 @@
   **不是**可登录账号，**不提供**密码登录与 JWT。  
 - **thread** 与 **Bot** 分属不同实体：**`threads.id`**（thread 主键）与 **该 Bot 的 `users.id`** **不得相等**  
   （实现须保证，见第 **1.4**、**2.1** 节）。  
-- 产品侧 **「群」** 与 **thread** 同义，见 [`用户需求.md`](用户需求.md) 第 5 节说明。
+- 产品侧 **「群」** 与 **thread** 同义，见 [`用户需求.md`](../../platform_docs/用户需求.md) 第 5 节说明。
 
 ### 1.2 存在性与唯一性
 
@@ -30,7 +30,7 @@
 
 ### 1.3 归属范围（仅本群）
 
-- Bot **仅**隶属于该 thread 对应的 **conversation**（与 [`技术设计.md`](技术设计.md) 第 6.3 节「群与会话」一致）。  
+- Bot **仅**隶属于该 thread 对应的 **conversation**（与 [`技术设计.md`](../../platform_docs/技术设计.md) 第 6.3 节「群与会话」一致）。  
 - Bot **必须**出现在该群的成员语义中（见第 2 节实现），且 **不得**出现在 **其他** thread / conversation 的成员关系中。  
 - 用户在任何 **其他** 群的成员列表、侧栏、消息流中 **不得**看到本群的 Bot。
 
@@ -63,7 +63,7 @@
 ### 1.7 本文范围外（见关联文档）
 
 - **Hermes、`skstudio-hermes`、网关插件、Bot 消息经 Hermes 下行落库**：见 [`Hermes与skstudio集成(一期).md`](Hermes与skstudio集成(一期).md)；本文 **不** 定义帧字段与适配器代码结构。  
-- **@Bot 触发 Hermes、上下文包窗口**：见完整方案 **§2.6** 与 [`技术设计.md`](技术设计.md) **§5.3**；本文 **1.4** 只约束 Bot **主键与展示名** 及与人类成员并列展示。  
+- **@Bot 触发 Hermes、上下文包窗口**：见完整方案 **§2.6** 与 [`技术设计.md`](../../platform_docs/技术设计.md) **§5.3**；本文 **1.4** 只约束 Bot **主键与展示名** 及与人类成员并列展示。  
 - Bot **单独**被邀请 / 踢出（Bot 生命周期 **从属于** thread / conversation 的创建与删除）。
 
 ---
@@ -134,16 +134,16 @@
   **`user_id`**（= Bot 的 **`users.id`**，**须**满足 **`user_id` ≠ `thread_id`**）；  
   **`display_name`**（= 该 thread 的 **`title`**）；**`avatar_url`** 或 **`avatar_key`**（固定机器人静态资源，见第 1.6 节）。
 
-### 2.5 消息、已读与未读（与 [`技术设计.md`](技术设计.md) 第 6.6、6.7 节对齐）
+### 2.5 消息、已读与未读（与 [`技术设计.md`](../../platform_docs/技术设计.md) 第 6.6、6.7 节对齐）
 
 - 一期 **Bot 不产生**用户可见的「主动发言」；若库中无 Bot 发送的消息，则消息列表仅体现人类。  
 - **已读人数分母（已定案）**：**不含** thread 固定 Bot。分母 = 该 **`conversation_id`** 下 **`group_members`** 联结 **`users`** 后  
   **`is_bot = false`** 的成员数，**再减 1（发送者）**（仅当发送者亦为人类成员时；Bot 代发消息若未来启用，发送者判定另见实现）。  
 - **已读记录**：**不**为 `is_bot = true` 的用户写入 **`group_message_reads`**（`mark_read` / WS 已读路径对 Bot `user_id` **跳过**）。  
 - **未读角标**：**默认**——**Bot 作为发送者的消息**（`sender_id` 指向 Bot 的 `users.id`）**不计入**其他成员的未读计数与侧栏角标聚合  
-  （与 [`用户需求.md`](用户需求.md) **U1** 一致）；人类互发规则不变。  
+  （与 [`用户需求.md`](../../platform_docs/用户需求.md) **U1** 一致）；人类互发规则不变。  
   **例外（方案 B · 2026-08-20）**：`threads.thread_kind = personal` 时 Bot 消息**计入**收件人未读（个人助理收件箱：inform / 偏差通知 / 助手回复等）；标已读取 max **含 Bot**。生产群等 kind 仍不计。已读回执路径仍跳过 Bot。  
-  实现锚点：`skstudio/backend/app/services/read_service.py`（`thread_counts_bot_unread`）；迭代见 [`skstudio-PA未读角标-personal例外迭代.md`](./skstudio-PA未读角标-personal例外迭代.md)。
+  实现锚点：`skstudio/backend/app/services/read_service.py`（`thread_counts_bot_unread`）；迭代见 [`skstudio-PA未读角标-personal例外迭代.md`](../../skstudio/docs/skstudio-PA未读角标-personal例外迭代.md)。
 - 与总规 **§6.6**、**§6.7**、**§11.1** `expected_reader_count` 及 **§14** 速查表表述一致；若本文与总规冲突，  
   **以修订日期较新且显式写「已定案」者为准**。
 
@@ -155,7 +155,7 @@
 
 ### 2.7 与总技术设计的关系
 
-- [`技术设计.md`](技术设计.md) 已在 **第 6.1、6.2、6.3、6.6、6.7 节** 与 **第 13、14 节** 增补与本文一致的 **摘要**  
+- [`技术设计.md`](../../platform_docs/技术设计.md) 已在 **第 6.1、6.2、6.3、6.6、6.7 节** 与 **第 13、14 节** 增补与本文一致的 **摘要**  
   （含主键不等、已读不含 Bot、未读不含 Bot 发言）；实现细节、验收仍以 **本文** 为准，  
   避免两处长篇重复。若后续改列名或约束，**须同步**改总规摘要 + 本文修订记录。
 
@@ -199,14 +199,14 @@
 | 编号 | 项 | 预期 |
 | ---- | -- | ---- |
 | D1 | 本文与 `用户需求` / `技术设计` 无矛盾 | 评审签字或纪要链接 |
-| D2 | [`技术设计.md`](技术设计.md) **§6.1–6.3、§6.6–6.7、§11.1、§13–14** 已与本文对齐；列名或约束变更须同 PR 更新 | PR 或变更单可指认 |
+| D2 | [`技术设计.md`](../../platform_docs/技术设计.md) **§6.1–6.3、§6.6–6.7、§11.1、§13–14** 已与本文对齐；列名或约束变更须同 PR 更新 | PR 或变更单可指认 |
 
 ---
 
 ## 4. 后续阶段（不在本文范围）
 
 - Hermes 平台适配器、**skstudio-hermes** WebSocket、服务 token 等：  
-  见 [`Hermes与skstudio集成(一期).md`](Hermes与skstudio集成(一期).md) 与 [`技术设计.md`](技术设计.md) 第 **5.3–5.4** 节；**Bot 基线**（本文第 **2–3** 节）宜先验收再扩展联调深度。
+  见 [`Hermes与skstudio集成(一期).md`](Hermes与skstudio集成(一期).md) 与 [`技术设计.md`](../../platform_docs/技术设计.md) 第 **5.3–5.4** 节；**Bot 基线**（本文第 **2–3** 节）宜先验收再扩展联调深度。
 
 ---
 
@@ -214,6 +214,6 @@
 
 | 日期 | 说明 |
 | ---- | ---- |
-| 2026-08-20 | **§2.5 / T10b**：`thread_kind=personal` Bot 计入未读（方案 B）；链 [PA未读角标迭代](./skstudio-PA未读角标-personal例外迭代.md)。 |
+| 2026-08-20 | **§2.5 / T10b**：`thread_kind=personal` Bot 计入未读（方案 B）；链 [PA未读角标迭代](../../skstudio/docs/skstudio-PA未读角标-personal例外迭代.md)。 |
 | 2026-05-14 | 关联文档改为 [`Hermes与skstudio集成(一期).md`](Hermes与skstudio集成(一期).md)；**§1.7**/**§4** 与 **@ 触发 Hermes**（完整方案 **§2.6**）交叉引用；**不**再引用已合并的旧文件名。 |
-| 2026-05-13 | **定稿合并**：**`users.id` ≠ `threads.id`**；**C1**；**未读不含 Bot 发言**；**内置 / 不登录**；修订记录与总规 **§6.1–6.7、§13–15** 同步（见 [`技术设计.md`](技术设计.md)）。 |
+| 2026-05-13 | **定稿合并**：**`users.id` ≠ `threads.id`**；**C1**；**未读不含 Bot 发言**；**内置 / 不登录**；修订记录与总规 **§6.1–6.7、§13–15** 同步（见 [`技术设计.md`](../../platform_docs/技术设计.md)）。 |

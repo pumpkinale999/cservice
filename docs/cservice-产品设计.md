@@ -2,7 +2,7 @@
 
 - **文档类型**：~~产品共识 + 架构与 MVP 验收真源~~ → **历史存档**
 - **版本**：**v0.9.24**
-- **状态**：**废止为运行真源**（2026-07-31 · 待 **P0** 拆除 · 含 UI）· 规范见 [平台控制面与Postgres迁移共识.md](./平台控制面与Postgres迁移共识.md) **D1/D19** · 勾选见 [TODO.md P0](./TODO.md)
+- **状态**：**废止为运行真源**（2026-07-31 · 待 **P0** 拆除 · 含 UI）· 规范见 [平台控制面与Postgres迁移共识.md](../../platform_docs/平台控制面与Postgres迁移共识.md) **D1/D19** · 勾选见 [TODO.md P0](../../platform_docs/TODO.md)
 - **产品定位（历史）**：**独立 repo `cservice`**（域 + API + 企微 kf）+ skstudio **UI 壳 + BFF** — 微信客户 ↔ 企微 API ↔ 接待人员 + **客服助手** Hermes Agent
 - **壳层入口（历史）**：skstudio 底 Tab **「客服」** · 路由 **`/cservice/*`** · **将删除**
 
@@ -10,17 +10,17 @@
 
 | 文档 | 用途 |
 | ---- | ---- |
-| [TODO.md](./TODO.md) | 实现勾选 · 剩余开放项 |
-| [组织知识库.md](./组织知识库.md) | **架构同构参照**：`knowledge_base` 独立 repo + skstudio UI 壳 |
+| [TODO.md](../../platform_docs/TODO.md) | 实现勾选 · 剩余开放项 |
+| [组织知识库.md](../../knowledge_base/docs/组织知识库.md) | **架构同构参照**：`knowledge_base` 独立 repo + skstudio UI 壳 |
 | [目标与执行及其组织支撑(实现与测试).md](./目标与执行及其组织支撑(实现与测试).md) | **架构同构参照**：`goal_execution` 双仓 · BFF · service token · **§2.4 GE 对照** |
 | [目标与执行及其组织支撑(需求).md](./目标与执行及其组织支撑(需求).md) | **Person ≡ User** · 评审员 · org 边界（§2.3 · §2.5） |
-| [skstudio-组织与企微同步.md](./skstudio-组织与企微同步.md) | 人员主数据 · org BFF · 设置 UI 人员选择器复用 |
-| [开发和部署.md](./开发和部署.md) | §2.4 kbase · §2.5 ge 三联调/四联调；**cservice 见本文 §2.3** |
-| [Personal-Assistant产品设计.md](./Personal-Assistant产品设计.md) | Hermes 独立 profile + `gateway_role` 隔离 |
-| [Hermes与组织知识库的集成.md](./Hermes与组织知识库的集成.md) | service token / sender 头约定（若 Agent 读 kbase · P2） |
+| [skstudio-组织与企微同步.md](../../skstudio/docs/skstudio-组织与企微同步.md) | 人员主数据 · org BFF · 设置 UI 人员选择器复用 |
+| [开发和部署.md](../../platform_docs/开发和部署.md) | §2.4 kbase · §2.5 ge 三联调/四联调；**cservice 见本文 §2.3** |
+| [Personal-Assistant产品设计.md](../../platform_docs/hermes-self/Personal-Assistant产品设计.md) | Hermes 独立 profile + `gateway_role` 隔离 |
+| [Hermes与组织知识库的集成.md](../../platform_docs/integration/hermes-knowledge_base/Hermes与组织知识库的集成.md) | service token / sender 头约定（若 Agent 读 kbase · P2） |
 | [微信客服 · 企微官方](https://developer.work.weixin.qq.com/document/path/94638) | kf API · 回调 · sync_msg / send_msg |
-| [hermes-profiles/cservice-assistant/](./hermes-profiles/cservice-assistant/README.md) | **客服助手** profile 模板（§25） |
-| [hermes-profiles/cservice-group-assistant/](./hermes-profiles/cservice-group-assistant/README.md) | **企微群助手** profile 模板（§25 旁链 · 二期） |
+| [hermes-profiles/cservice-assistant/](../../platform_docs/integration/hermes-skstudio/profiles/cservice-assistant/README.md) | **客服助手** profile 模板（§25） |
+| [hermes-profiles/cservice-group-assistant/](../../platform_docs/integration/hermes-skstudio/profiles/cservice-group-assistant/README.md) | **企微群助手** profile 模板（§25 旁链 · 二期） |
 | [cservice-产品设计-二期.md](./cservice-产品设计-二期.md) | **二期**：企微客户群 · 多对1 · Bot agent-inside（**P4** · 与 M8 运营分开） |
 
 **代码仓库（normative · v0.9.0）**
@@ -323,7 +323,7 @@ skstudio/
 
 ### 2.4 与 goal_execution 同构对照（Normative · v0.9.16）
 
-对齐 [《目标与执行(实现)》§1.2–§1.5](./目标与执行及其组织支撑(实现与测试).md#12-双仓对照normative) · [《组织知识库》v1.0.15 BFF 信任模型](./组织知识库.md)。
+对齐 [《目标与执行(实现)》§1.2–§1.5](./目标与执行及其组织支撑(实现与测试).md#12-双仓对照normative) · [《组织知识库》v1.0.15 BFF 信任模型](../../knowledge_base/docs/组织知识库.md)。
 
 | 维度 | goal_execution (GE) | cservice（M7 目标态） | 一致？ |
 | --- | --- | --- | --- |
@@ -372,7 +372,7 @@ cservice_customer.external_userid（微信客户 · cservice 域 ONE REALITY · 
 | **评审员** | skstudio config | **不存** |
 | **企微 kf 接待名单（enforcement）** | **cservice `kf_servicer`（API 模式）** | **API 管理** `open_kfid` **仅**写 cservice DB · **不** sync 企微后台接待人员 · 进线分配走 **trans API**（§8.1） |
 
-**读路径（设置 UI · List 审计名）**：BFF 读 cservice `user_id` 列表 → join skstudio `users`（+ 可选 GE org_path）→ 返回 UI。**同** org 人员列表聚合模式（[`skstudio-组织与企微同步.md`](./skstudio-组织与企微同步.md)）。
+**读路径（设置 UI · List 审计名）**：BFF 读 cservice `user_id` 列表 → join skstudio `users`（+ 可选 GE org_path）→ 返回 UI。**同** org 人员列表聚合模式（[`skstudio-组织与企微同步.md`](../../skstudio/docs/skstudio-组织与企微同步.md)）。
 
 **写路径（保存接待名单 · Normative）**：
 
@@ -952,7 +952,7 @@ flowchart LR
 
 **目的**：在 §0.2 closure 口径下，把 P0/P1 拆成 **可独立验收、可合并、可回滚** 的五段交付；每段结束须 **fixture 单测绿 + 可演示最小路径**（§27）。
 
-> **实现状态**：§0.4 MVP closure **已达成**；post-M5 增量见 **§0.5 · §10.3**；勾选见 [TODO.md § cservice](./TODO.md#cservice)。
+> **实现状态**：§0.4 MVP closure **已达成**；post-M5 增量见 **§0.5 · §10.3**；勾选见 [TODO.md § cservice](../../platform_docs/TODO.md#cservice)。
 
 **依赖（串行关键路径）**：
 
@@ -1049,13 +1049,13 @@ flowchart LR
 
 #### 与 TODO.md 勾选
 
-实现进度在 [TODO.md § cservice](./TODO.md#cservice) 按 **M1–M5** 分小节勾选；每 milestone 关闭时在 PR 描述中引用 **CS-xx** 与本文 §10.1 表。
+实现进度在 [TODO.md § cservice](../../platform_docs/TODO.md#cservice) 按 **M1–M5** 分小节勾选；每 milestone 关闭时在 PR 描述中引用 **CS-xx** 与本文 §10.1 表。
 
 ### 10.2 Milestone 总览与分段理由（normative · 追踪用）
 
 <a id="milestone-tracking"></a>
 
-> **读谁**：PM / 研发排期 · 对照 [TODO.md § cservice](./TODO.md#cservice) 勾选 · PR 描述引用 **M* + CS-xx**。
+> **读谁**：PM / 研发排期 · 对照 [TODO.md § cservice](../../platform_docs/TODO.md#cservice) 勾选 · PR 描述引用 **M* + CS-xx**。
 
 #### 10.2.1 需要几个 Milestone？
 
@@ -1131,7 +1131,7 @@ cservice 同时涉及 **双仓**（`cservice` + skstudio）、**企微 kf 管道
 
 **门禁**：`verify_cservice_m3.sh`（CS-19 富文本断言）· `verify_cservice_m6.sh`（新增 · CS-20–24）· `npm test -- src/cservice` · staging/prod CS-25 smoke。
 
-**与 TODO.md**：在 [TODO.md § cservice M6](./TODO.md#cservice) 按上表勾选 · **PR 顺序**见 **§0.7**；**勿**与 M1–M5 混勾。
+**与 TODO.md**：在 [TODO.md § cservice M6](../../platform_docs/TODO.md#cservice) 按上表勾选 · **PR 顺序**见 **§0.7**；**勿**与 M1–M5 混勾。
 
 ### 10.4 M7 · 接待配置与 Tab 门禁（normative · v0.9.16+）
 
@@ -2402,7 +2402,7 @@ frontend/src/cservice/
 
 ### 25.2 SOUL 要点（摘要 · v0.9.8）
 
-完整正文见 [`SOUL.md`](./hermes-profiles/cservice-assistant/SOUL.md)：
+完整正文见 [`SOUL.md`](../../platform_docs/integration/hermes-skstudio/profiles/cservice-assistant/SOUL.md)：
 
 1. **只起草、不发送**；禁止代客户承诺价格/合同/**医疗疗效**等敏感事项。
 2. 输出 **可直接发送** 的正文（无 markdown）；≤500 字；无「以下是建议回复：」等前缀。
@@ -2791,7 +2791,7 @@ CSERVICE_URL=http://127.0.0.1:8093
 CSERVICE_SERVICE_TOKEN=          # 与 cservice CSERVICE_SERVICE_TOKEN 相同
 ```
 
-**Hermes profile `.env`**：见 [`cservice-assistant.env.example`](./hermes-profiles/env/cservice-assistant.env.example)。
+**Hermes profile `.env`**：见 [`cservice-assistant.env.example`](../../platform_docs/integration/hermes-skstudio/profiles/env/cservice-assistant.env.example)。
 
 ### 30.2 Nginx
 

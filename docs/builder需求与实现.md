@@ -2,20 +2,20 @@
 
 - **文档类型**：产品与研发 **规范性** 指导（normative）
 - **版本**：**v1.2.8**
-- **状态**：共识真源（**取代** [Agent-Builder构建路线图](./Agent-Builder构建路线图.md) 作为 Builder **产品叙事**；路线图保留为历史实施对照，**新功能以本文为准**）
+- **状态**：共识真源（**取代** [Agent-Builder构建路线图](../../platform_docs/hermes-self/Agent-Builder构建路线图.md) 作为 Builder **产品叙事**；路线图保留为历史实施对照，**新功能以本文为准**）
 - **适用对象**：skstudio 前端 / 后端、Hermes Agent Lab Plugin、`agent-builder` profile
-- **产品环境**：[专业智能体规范 §1.0](./专业智能体规范.md#10-三大产品环境normative) · **开发环境** · Builder Bot
+- **产品环境**：[专业智能体规范 §1.0](../../platform_docs/专业智能体规范.md#10-三大产品环境normative) · **开发环境** · Builder Bot
 
 **上位规范**（冲突时服从）：
 
 | 文档 | 职责 |
 | --- | --- |
-| [专业智能体规范.md](./专业智能体规范.md) | 三环境纪律、B-Def / Done、附录 B 机检 |
-| [Agent定义模型.md](./Agent定义模型.md) | 八方面、L1/L2/L3、Aspect ↔ 资产映射 |
+| [专业智能体规范.md](../../platform_docs/专业智能体规范.md) | 三环境纪律、B-Def / Done、附录 B 机检 |
+| [Agent定义模型.md](../../platform_docs/hermes-self/Agent定义模型.md) | 八方面、L1/L2/L3、Aspect ↔ 资产映射 |
 | [hermes与skstudio集成(八期).md](./hermes与skstudio集成(八期).md) | Builder 群、`BuilderStudioPanel`、HTTP 路由 |
 | [hermes与skstudio集成(九期).md](./hermes与skstudio集成(九期).md) | Lab 测评、`LabEvaluationPanel`、HD-* |
 
-**历史对照**：[Agent-Builder构建路线图.md](./Agent-Builder构建路线图.md)（Playbook P0–P6、W1/W2/W3 波次；**产品面收敛后不再扩展独立 Tab / 用户编辑**）
+**历史对照**：[Agent-Builder构建路线图.md](../../platform_docs/hermes-self/Agent-Builder构建路线图.md)（Playbook P0–P6、W1/W2/W3 波次；**产品面收敛后不再扩展独立 Tab / 用户编辑**）
 
 | 章 | 内容 |
 | --- | --- |
@@ -44,7 +44,7 @@
 | **L2** | `versions/<ver>/` 下 Markdown/YAML/fixtures/**VERSION**、`.harness/`（证据子集） | **B 资产**只读浏览；**唯一 Spec 写入**经 Builder 工具 |
 | **L3** | materialize 后的 profile、`workspace/` | Builder **不**直接编辑；handoff 后由 Lab 消费 |
 
-原则（与 [Agent定义模型 §0](./Agent定义模型.md#0-与现有规范的关系) 一致）：
+原则（与 [Agent定义模型 §0](../../platform_docs/hermes-self/Agent定义模型.md#0-与现有规范的关系) 一致）：
 
 1. **L2 为合格与否的最终依据**。
 2. **L1 是索引，不是第二真源**（BD-0）。
@@ -88,7 +88,7 @@ flowchart LR
 **Builder 不负责**（归 Lab / 发布）：
 
 - SCENARIOS 对话测评、`.harness/` 写入（[九期 §5.4](./hermes与skstudio集成(九期).md#54-测评工作台labevaluationpanel--完整档--v930)）
-- 研发 Done 人检 **HD-1～HD-9**、publish-preflight（[规范 §6.1–6.2](./专业智能体规范.md#61-研发-done人工核对项--hd-1hd-9)）
+- 研发 Done 人检 **HD-1～HD-9**、publish-preflight（[规范 §6.1–6.2](../../platform_docs/专业智能体规范.md#61-研发-done人工核对项--hd-1hd-9)）
 
 ---
 
@@ -96,7 +96,7 @@ flowchart LR
 
 ### 2.1 右栏结构（normative）
 
-右栏 **仅两块**，对应 [Agent定义模型](./Agent定义模型.md) 的 L1 摘要 + L2 树：
+右栏 **仅两块**，对应 [Agent定义模型](../../platform_docs/hermes-self/Agent定义模型.md) 的 L1 摘要 + L2 树：
 
 | 区块 | 名称 | 能力 | 模式 |
 | --- | --- | --- | --- |
@@ -105,7 +105,7 @@ flowchart LR
 
 **禁止**在右栏增加第三块「评价面板」、Contract / Trace / Fixtures **独立 Tab**、Playbook 步骤条作为主 UX（见 §2.6）。
 
-**Lab 对称（v9.5.2 · 单 @ver）**：Lab 右栏 **总览 · 测评 · Production Tool · 资产**；**测试 @ver = 预发布 @ver**（pin 后同号）。Builder handoff 前 **`spec-ready` 含 BD-12b**（同 @ver 已含 Lab + Production overlay）；Kanban REG-K01 **宜 handoff 前**写入 SCENARIOS（[规范 §3.4.0](./专业智能体规范.md#340-版本目录资产单文件-vs-双文件-vs-运行时派生normative--v170) · [九期 §5.5.10](./hermes与skstudio集成(九期).md#5510-release_pin-与-kanban-脚手架v952)）。
+**Lab 对称（v9.5.2 · 单 @ver）**：Lab 右栏 **总览 · 测评 · Production Tool · 资产**；**测试 @ver = 预发布 @ver**（pin 后同号）。Builder handoff 前 **`spec-ready` 含 BD-12b**（同 @ver 已含 Lab + Production overlay）；Kanban REG-K01 **宜 handoff 前**写入 SCENARIOS（[规范 §3.4.0](../../platform_docs/专业智能体规范.md#340-版本目录资产单文件-vs-双文件-vs-运行时派生normative--v170) · [九期 §5.5.10](./hermes与skstudio集成(九期).md#5510-release_pin-与-kanban-脚手架v952)）。
 
 ### 2.2 A — 总览
 
@@ -181,7 +181,7 @@ flowchart LR
 4. 切换辅导 **slug** 时 **自动** `@Builder Bot /new` 清 Hermes session，避免上一 agent 的对话记忆影响新 agent 定义（切换 @ver **不**自动清 session）。
 5. **严格就绪**（v1.2.4）：侧栏「定义就绪」与「部署到测试环境」、后端 `handoff-to-lab` **同一标准** — `validate.ready` 且无任何 `ok=false`（**含 BD-12b · 同 @ver production overlay**）。**BD-10**：Builder IM 发起 `lab_version_save` 即 `human_confirmed`；已保存版本 describe 将 BD-10 记为已确认，**不**单独挡部署。
 6. **定版纪律**（v1.2.4）：用户确认后 **先** `lab_version_save(dry_run=true)`，根据返回 `validate.checks` 修稿，再正式 save；**勿**用 `lab_spec_validate(base_ver)` 预判能否保存。SCENARIOS 落盘格式为 **hr 表格体**（见 profile `gold-standard-format.md`）。
-7. **版本语义**（v1.2.5 · v1.2.8 增补）：`VERSION.md` 的 `version:` 字段 = Git **@ver**。保存时 `ensure_impl_bundle` 写入 overlay/lock 注释 `# agent_spec_version: <@ver>`。**BD-16**（warn-only）：Lab profile `VERSION.md` 与 **materialize 时的 editing @ver** 一致（[规范 v1.7.0 单 @ver pin](./专业智能体规范.md#621-skstudio-测评工作台-ui-门禁v1020--normative)）。
+7. **版本语义**（v1.2.5 · v1.2.8 增补）：`VERSION.md` 的 `version:` 字段 = Git **@ver**。保存时 `ensure_impl_bundle` 写入 overlay/lock 注释 `# agent_spec_version: <@ver>`。**BD-16**（warn-only）：Lab profile `VERSION.md` 与 **materialize 时的 editing @ver** 一致（[规范 v1.7.0 单 @ver pin](../../platform_docs/专业智能体规范.md#621-skstudio-测评工作台-ui-门禁v1020--normative)）。
 
 ### 2.5 Builder 工具（MCP / Plugin）
 
@@ -207,7 +207,7 @@ Profile 真源：`hermes-profiles/agent-builder/`（SOUL · AGENTS · BUILDER-AS
 | 项 | 说明 |
 | --- | --- |
 | **用户在右栏编辑 L2 资产** | **不做**；无编辑器、无保存、不放开 410 |
-| **右栏 fork / apply / sync-bdef 写 Spec** | 保持 410（[save_policy](./专业智能体规范.md)） |
+| **右栏 fork / apply / sync-bdef 写 Spec** | 保持 410（[save_policy](../../platform_docs/专业智能体规范.md)） |
 | **Contract / Trace / Fixtures 独立 Tab** | 并入 B 树 + @ 评价；不另开 Tab |
 | **Playbook P0–P6 作为主 UX** | 可内化为 A 阻塞摘要；不展示步骤条为主导航 |
 | **save 前 impl 预览独立面板** | 由 Builder 对话说明；不单独右栏模块 |
@@ -272,13 +272,13 @@ Profile 真源：`hermes-profiles/agent-builder/`（SOUL · AGENTS · BUILDER-AS
 | Hermes 执行 | `hermes-agent/plugins/skstudio-agent-lab/` · `kanban/dashboard/skstudio_agent_lab_api.py` |
 | 教练 Profile | `hermes-profiles/agent-builder/` |
 
-**教练群与 Tool Builder（v0.3.0 · 已实现）**：**登录/注册** 时 `provision_agent_studio_for_user` 为 **所有人类用户** 幂等创建 **`Agent Builder ({username})`** 与 per-user **`Tool Builder ({username})` 私坊**（`thread_kind=tool_builder` · **`tool-builder` profile GW** · TB-ISO）；legacy 共享群 title=`Tool Builder` 仅评审员可见，迁移见 **`scripts/migrate_tool_builder_private.py`**。**不** 等待 dev 申请获批。dev 获批创建的是 **业务 Lab 测评群**。存量回填：**`scripts/backfill_agent_studio.py`**。**Tool Builder 真源**：[Tool-Builder v0.3.1](./Tool-Builder产品设计.md)（L2 通过后手动提交发布申请）。
+**教练群与 Tool Builder（v0.3.0 · 已实现）**：**登录/注册** 时 `provision_agent_studio_for_user` 为 **所有人类用户** 幂等创建 **`Agent Builder ({username})`** 与 per-user **`Tool Builder ({username})` 私坊**（`thread_kind=tool_builder` · **`tool-builder` profile GW** · TB-ISO）；legacy 共享群 title=`Tool Builder` 仅评审员可见，迁移见 **`scripts/migrate_tool_builder_private.py`**。**不** 等待 dev 申请获批。dev 获批创建的是 **业务 Lab 测评群**。存量回填：**`scripts/backfill_agent_studio.py`**。**Tool Builder 真源**：[Tool-Builder v0.3.1](../../platform_docs/hermes-self/Tool-Builder产品设计.md)（L2 通过后手动提交发布申请）。
 
 ### 4.2 HTTP API（Builder 群）
 
 > **现网 thread_kind（normative · 勿改）**  
 > Builder 教练群在实现上为 **`thread_kind=agent_lab`** 且 **`agent_slug=agent-builder`**（[八期 §5.2](./hermes与skstudio集成(八期).md)）。  
-> 规范远期分型 `agent_builder_studio`（[路线图 W3-7](./Agent-Builder构建路线图.md)）**不在本迭代改库**；本文 API 路由与 `thread_kind` 判定以现网为准。
+> 规范远期分型 `agent_builder_studio`（[路线图 W3-7](../../platform_docs/hermes-self/Agent-Builder构建路线图.md)）**不在本迭代改库**；本文 API 路由与 `thread_kind` 判定以现网为准。
 
 **沿用**（[八期 §5.4.5](./hermes与skstudio集成(八期).md)）：
 
@@ -314,7 +314,7 @@ Profile 真源：`hermes-profiles/agent-builder/`（SOUL · AGENTS · BUILDER-AS
 
 | 方法 | 路径 | 场景 | 规格 |
 | --- | --- | --- | --- |
-| POST | `…/builder-studio/fixtures` | Builder · 单文件 fixtures | [路线图 B.2.4](./Agent-Builder构建路线图.md) |
+| POST | `…/builder-studio/fixtures` | Builder · 单文件 fixtures | [路线图 B.2.4](../../platform_docs/hermes-self/Agent-Builder构建路线图.md) |
 | PATCH | Hermes `…/agent-lab/agents/{slug}/tool-overlay` | Builder Lab Tool · 测评群 Production Tool | [能力与过程(一期) §2.4](./能力与过程(一期).md#24-api) · `context=builder \| lab_evaluation` |
 | — | Hermes Plugin **`lab_tool_overlay_patch`** | Builder 聊天改 tool（与侧栏 PATCH 同路径 · `context=builder`） | [一期 §2.8.3](./能力与过程(一期).md#283-tool-独立区块--列表--选择--配置) |
 
@@ -346,7 +346,7 @@ Profile 真源：`hermes-profiles/agent-builder/`（SOUL · AGENTS · BUILDER-AS
 
 ### 4.5 与 Authoring Matrix 的关系
 
-[Agent定义模型 §5](./Agent定义模型.md#5-authoring-matrix--对话--ui--平台) 中 **ui_form / ui_upload / ui_table** 对 Builder 右栏 **不适用**（用户不编辑）。Builder 右栏对应：
+[Agent定义模型 §5](../../platform_docs/hermes-self/Agent定义模型.md#5-authoring-matrix--对话--ui--平台) 中 **ui_form / ui_upload / ui_table** 对 Builder 右栏 **不适用**（用户不编辑）。Builder 右栏对应：
 
 | Aspect | Builder UI | 写入 |
 | --- | --- | --- |
@@ -412,7 +412,7 @@ Profile 真源：`hermes-profiles/agent-builder/`（SOUL · AGENTS · BUILDER-AS
 
 ## 7. 实施路线图（PR 切分 · normative）
 
-本文 **取代** [Agent-Builder构建路线图](./Agent-Builder构建路线图.md) 的 **新产品迭代**；历史 W1/M3a 代码（Playbook 主 UX、Contract Tab 等）在收敛 PR 中 **删除或合并**，见 §7.2。
+本文 **取代** [Agent-Builder构建路线图](../../platform_docs/hermes-self/Agent-Builder构建路线图.md) 的 **新产品迭代**；历史 W1/M3a 代码（Playbook 主 UX、Contract Tab 等）在收敛 PR 中 **删除或合并**，见 §7.2。
 
 ### 7.1 PR 列表与依赖
 
@@ -647,6 +647,6 @@ Response：
 | v1.2.3 | 2026-05-31 | §2.2 A 总览 UI 收敛；严格就绪 + handoff 对齐；移除侧栏 BD-10 / 六维 / 重新检查 |
 | v1.2.4 | 2026-06-01 | 定版共识：hr SCENARIOS 真源、save 先 dry_run、`lab_version_save` 失败返回完整 validate、BD-10=IM 保存即人确、profile/skill 对齐 |
 | v1.2.5 | 2026-06-01 | 双轨 version 语义、`agent_spec_version` 注释、save 忽略 overlay/lock 透传、`pinned_commit` 与 spec commit 对齐、BD-16 materialize 告警 |
-| v1.2.6 | 2026-06-01 | 文档对齐：[专业智能体规范 v1.5.5](./专业智能体规范.md) 附录 B **BD-16**；BUILDER-ASSESS / bdef-checklist / 八期 §6.10；安装脚本同步 skills 树 |
-| v1.2.8 | 2026-06-04 | **单 @ver 策略 A**：§2.1 Lab 对称 · handoff 含 BD-12b · 链 [规范 v1.7.0 §3.4.0](./专业智能体规范.md#340-版本目录资产单文件-vs-双文件-vs-运行时派生normative--v170) |
+| v1.2.6 | 2026-06-01 | 文档对齐：[专业智能体规范 v1.5.5](../../platform_docs/专业智能体规范.md) 附录 B **BD-16**；BUILDER-ASSESS / bdef-checklist / 八期 §6.10；安装脚本同步 skills 树 |
+| v1.2.8 | 2026-06-04 | **单 @ver 策略 A**：§2.1 Lab 对称 · handoff 含 BD-12b · 链 [规范 v1.7.0 §3.4.0](../../platform_docs/专业智能体规范.md#340-版本目录资产单文件-vs-双文件-vs-运行时派生normative--v170) |
 | v1.2.7 | 2026-06-01 | **BuilderStudioSelectionContext** 跨群恢复 slug/@ver；链 [九期 v9.4.1](./hermes与skstudio集成(九期).md) Lab 总览 UI 收敛 |
