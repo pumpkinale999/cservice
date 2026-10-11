@@ -1,5 +1,7 @@
 # cservice 文档
 
+> **跨仓链接说明**：本目录文档含跨仓引用（`../../platform_docs/`、`../其他项目/docs/`）。本地 clone 全部项目仓到同一父目录方可跳转；GitHub 单仓渲染时跨仓链接可能失效，请按下方索引浏览。
+
 cservice（客服）项目文档。
 
 > 注：cservice 已在平台控制面迁移中拆除（见 [平台控制面与Postgres迁移共识.md](../../platform_docs/平台控制面与Postgres迁移共识.md) D1/D19）。以下为历史产品设计文档，留档参考。
