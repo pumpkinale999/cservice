@@ -19,8 +19,8 @@
 | [Personal-Assistant产品设计.md](../../platform_docs/hermes-self/Personal-Assistant产品设计.md) | Hermes 独立 profile + `gateway_role` 隔离 |
 | [Hermes与组织知识库的集成.md](../../platform_docs/integration/hermes-knowledge_base/Hermes与组织知识库的集成.md) | service token / sender 头约定（若 Agent 读 kbase · P2） |
 | [微信客服 · 企微官方](https://developer.work.weixin.qq.com/document/path/94638) | kf API · 回调 · sync_msg / send_msg |
-| [hermes-profiles/cservice-assistant/](../../platform_docs/integration/hermes-skstudio/profiles/cservice-assistant/README.md) | **客服助手** profile 模板（§25） |
-| [hermes-profiles/cservice-group-assistant/](../../platform_docs/integration/hermes-skstudio/profiles/cservice-group-assistant/README.md) | **企微群助手** profile 模板（§25 旁链 · 二期） |
+| [hermes-profiles/cservice-assistant/](../../platform_docs/agent-schema/README.md) | **客服助手** profile 模板（§25） |
+| [hermes-profiles/cservice-group-assistant/](../../platform_docs/agent-schema/README.md) | **企微群助手** profile 模板（§25 旁链 · 二期） |
 | [cservice-产品设计-二期.md](./cservice-产品设计-二期.md) | **二期**：企微客户群 · 多对1 · Bot agent-inside（**P4** · 与 M8 运营分开） |
 
 **代码仓库（normative · v0.9.0）**
